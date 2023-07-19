@@ -97,15 +97,6 @@
       "default": null
     },
     {
-      "name": "sessionId",
-      "doc": "The ID of the session that the event relates to. Filled from the X-BinX-Session-ID HTTP header.",
-      "type": [
-        "null",
-        "string"
-      ],
-      "default": null
-    },
-    {
       "name": "correlationIds",
       "doc": "Any IDs that relate to the event. The keys store the name of the ID, the value is the value of the ID. Example keys: paymentId, UETR, transactionId, internalCorrelationId, transactionGroupId, endToEndId",
       "type": [
