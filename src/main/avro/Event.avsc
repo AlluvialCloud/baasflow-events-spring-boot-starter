@@ -1,0 +1,130 @@
+{
+  "name": "Event",
+  "namespace": "com.baasflow.events",
+  "type": "record",
+  "fields": [
+    {
+      "name": "id",
+      "doc": "The unique ID of the event.",
+      "type": {
+        "type": "string",
+        "logicalType": "uuid"
+      }
+    },
+    {
+      "name": "eventTimestamp",
+      "doc": "The timestamp of the event, showing when the event happened. Not related to the event ingestion time.",
+      "type": [
+        "null",
+        {
+          "type": "long",
+          "logicalType": "timestamp-micros"
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "eventType",
+      "doc": "The type of the event. Possible values: audit, business, technical, unspecified.",
+      "type": [
+        "null",
+        {
+          "name": "EventType",
+          "type": "enum",
+          "symbols": [
+            "audit",
+            "business",
+            "technical",
+            "unspecified"
+          ]
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "sourceModule",
+      "doc": "The module that sends the event. Example values: c360, order_manager.",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "event",
+      "doc": "The event that happened. For REST API events set it to operationId from the OpenAPI specification. For other events set to sensible values.",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "eventLogLevel",
+      "doc": "The log level of the event. Possible values: TRACE, DEBUG, INFO, WARN, ERROR. For audit event, always set to INFO.",
+      "type": [
+        "null",
+        {
+          "name": "EventLogLevel",
+          "type": "enum",
+          "symbols": [
+            "TRACE",
+            "DEBUG",
+            "INFO",
+            "WARN",
+            "ERROR"
+          ]
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "eventStatus",
+      "doc": "The status of the event. For REST API events set it to success if the HTTP response code is 2xx and to failure otherwise.",
+      "type": [
+        "null",
+        {
+          "name": "EventStatus",
+          "type": "enum",
+          "symbols": [
+            "unknown",
+            "in_progress",
+            "success",
+            "failure"
+          ]
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "sessionId",
+      "doc": "The ID of the session that the event relates to. Filled from the X-BinX-Session-ID HTTP header.",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
+      "name": "correlationIds",
+      "doc": "Any IDs that relate to the event. The keys store the name of the ID, the value is the value of the ID. Example keys: paymentId, UETR, transactionId, internalCorrelationId, transactionGroupId, endToEndId",
+      "type": [
+        "null",
+        {
+          "type": "map",
+          "values": "string"
+        }
+      ],
+      "default": null
+    },
+    {
+      "name": "payload",
+      "doc": "Any other important information that relate to the event. For the audit log it should mostly remain empty.",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    }
+  ]
+}
