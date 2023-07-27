@@ -1,5 +1,9 @@
-package com.baasflow.events;
+package com.baasflow.events.internal;
 
+import com.baasflow.events.Event;
+import com.baasflow.events.EventLogLevel;
+import com.baasflow.events.EventStatus;
+import com.baasflow.events.EventType;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
