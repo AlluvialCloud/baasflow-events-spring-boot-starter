@@ -11,9 +11,9 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TestAuditEventBuilder {
+class TestEventBuilder {
 
-    private AuditEventBuilder builder = new AuditEventBuilder();
+    private EventBuilder builder = new EventBuilder();
 
     @Test
     public void testPlain() throws JSONException {

@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @Service
-public class AuditEventBuilder {
+public class EventBuilder {
 
     public Event auditlogEvent(String sourceModule, String event, EventStatus eventStatus) {
         return this.auditlogEvent(sourceModule, event, eventStatus, null);
@@ -28,7 +28,20 @@ public class AuditEventBuilder {
                 .build();
     }
 
-    private static Event.Builder createEventBuilder() {
+    public Event event(String sourceModule, String event, EventType eventType, EventStatus eventStatus, String payload, String payloadType, Map<CharSequence, CharSequence> correlationIds) {
+        return createEventBuilder()
+                .setEvent(event)
+                .setEventLogLevel(EventLogLevel.INFO)
+                .setEventType(eventType)
+                .setEventStatus(eventStatus)
+                .setSourceModule(sourceModule)
+                .setPayload(payload)
+                .setPayloadType(payloadType)
+                .setCorrelationIds(correlationIds)
+                .build();
+    }
+
+    public static Event.Builder createEventBuilder() {
         return Event.newBuilder()
                 .setId(UUID.randomUUID())
                 .setEventTimestamp(Instant.now())

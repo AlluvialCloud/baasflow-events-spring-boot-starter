@@ -14,8 +14,8 @@ class TestKafkaSender {
 
     @Test
     public void testSerialization() throws IOException {
-        Event event1 = new AuditEventBuilder().auditlogEvent("sample-module", "event-happened", EventStatus.success);
-        Event event2 = new AuditEventBuilder().auditlogEvent("sample-module", "event-happened", EventStatus.success);
+        Event event1 = new EventBuilder().auditlogEvent("sample-module", "event-happened", EventStatus.success);
+        Event event2 = new EventBuilder().auditlogEvent("sample-module", "event-happened", EventStatus.success);
         byte[] result1 = kafkaSender.serialize(event1);
         byte[] result2 = kafkaSender.serialize(event1);
         byte[] result3 = kafkaSender.serialize(event2);
