@@ -1,5 +1,7 @@
-package com.baasflow.events;
+package com.baasflow.events.internal;
 
+import com.baasflow.events.Event;
+import com.baasflow.events.EventStatus;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;

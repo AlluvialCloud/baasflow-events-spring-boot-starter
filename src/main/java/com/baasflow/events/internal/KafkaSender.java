@@ -33,7 +33,7 @@ public class KafkaSender {
         kafkaTemplate.send(auditlogTopic, eventId, serialized);
     }
 
-    private byte[] serialize(Event event) throws IOException {
+    byte[] serialize(Event event) throws IOException {
         byte[] message = event.toByteBuffer().array();
         logger.debug("serialized event {} to {} bytes", event.getId(), message.length);
         return message;

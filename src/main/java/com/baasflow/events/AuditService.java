@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.Map;
 
 @Service
 public class AuditService {
@@ -21,7 +22,11 @@ public class AuditService {
 
 
     public void sendAuditlog(String sourceModule, String event, EventStatus eventStatus) {
-        Event eventMessage = builder.auditlogEvent(sourceModule, event, eventStatus);
+        this.sendAuditlog(sourceModule, event, eventStatus, null);
+    }
+
+    public void sendAuditlog(String sourceModule, String event, EventStatus eventStatus, Map<CharSequence, CharSequence> correlationIds) {
+        Event eventMessage = builder.auditlogEvent(sourceModule, event, eventStatus, correlationIds);
         try {
             kafkaSender.send(eventMessage);
 
