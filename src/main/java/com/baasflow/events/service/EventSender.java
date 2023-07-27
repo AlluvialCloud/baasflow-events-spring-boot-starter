@@ -1,12 +1,14 @@
 package com.baasflow.events.service;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-@Slf4j
 @Service
 public class EventSender {
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     public void send() {
-        log.info("send invoked");
+        logger.info("send invoked");
     }
 }
