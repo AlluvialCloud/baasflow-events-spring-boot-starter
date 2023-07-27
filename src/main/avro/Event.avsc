@@ -116,6 +116,15 @@
         "string"
       ],
       "default": null
+    },
+    {
+      "name": "payloadType",
+      "doc": "Type of the payload",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
     }
   ]
 }
