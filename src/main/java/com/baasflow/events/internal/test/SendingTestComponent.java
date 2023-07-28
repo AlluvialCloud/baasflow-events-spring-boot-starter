@@ -28,7 +28,7 @@ public class SendingTestComponent implements CommandLineRunner {
 
             while (true) {
                 int count = (int) (Math.random() * 10000);
-                if (count %2 == 0) {
+                if (count % 2 == 0) {
                     eventService.sendAuditlog("source" + count, "event" + count, Math.random() > 0.3 ? EventStatus.success : EventStatus.failure);
                 } else {
                     eventService.sendEvent("source" + count, "event" + count, EventType.business, Math.random() > 0.3 ? EventStatus.success : EventStatus.failure, "payload" + count, "payload" + count);
