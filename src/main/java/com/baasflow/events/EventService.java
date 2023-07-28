@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
-public class AuditService {
+public class EventService {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired

@@ -1,4 +1,4 @@
-package com.baasflow.events.test;
+package com.baasflow.events;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

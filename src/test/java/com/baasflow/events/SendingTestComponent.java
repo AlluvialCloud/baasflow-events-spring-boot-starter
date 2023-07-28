@@ -1,6 +1,6 @@
-package com.baasflow.events.test;
+package com.baasflow.events;
 
-import com.baasflow.events.AuditService;
+import com.baasflow.events.EventService;
 import com.baasflow.events.EventStatus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +14,7 @@ public class SendingTestComponent implements CommandLineRunner {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    AuditService auditService;
+    EventService eventService;
 
     @Value("${auditlog.testing:false}")
     boolean testing;
@@ -28,7 +28,7 @@ public class SendingTestComponent implements CommandLineRunner {
             while (true) {
                 logger.info("sending sample event to kafka");
                 int count = (int) (Math.random() * 10000);
-                auditService.sendAuditlog("source" + count, "event" + count, Math.random() > 0.3 ? EventStatus.success : EventStatus.failure);
+                eventService.sendAuditlog("source" + count, "event" + count, Math.random() > 0.3 ? EventStatus.success : EventStatus.failure);
 
                 Thread.sleep(5000);
             }

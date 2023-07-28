@@ -9,22 +9,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-class TestAuditService {
+class TestEventService {
 
     @Test
     public void testSendWithBuilder() throws Exception {
-        AuditService auditService = new AuditService();
-        auditService.kafkaSender = mock(KafkaSender.class);
+        EventService eventService = new EventService();
+        eventService.kafkaSender = mock(KafkaSender.class);
 
         ArgumentCaptor<Event> valueCapture = ArgumentCaptor.forClass(Event.class);
-        doNothing().when(auditService.kafkaSender).send(valueCapture.capture());
+        doNothing().when(eventService.kafkaSender).send(valueCapture.capture());
 
-        auditService.sendEvent(event ->
+        eventService.sendEvent(event ->
                 event.setPayload("payload")
                         .setPayloadType("string")
                         .setSourceModule("source module"));
 
-        verify(auditService.kafkaSender, Mockito.atLeastOnce()).send(any());
+        verify(eventService.kafkaSender, Mockito.atLeastOnce()).send(any());
 
         Event captured = valueCapture.getValue();
         assertEquals("payload", captured.getPayload());
