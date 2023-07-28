@@ -1,6 +1,8 @@
 package com.baasflow.events.internal;
 
+import com.baasflow.events.internal.KafkaConfigProperties;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.Priority;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +14,6 @@ import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
-import java.util.Map;
 
 @Component
 public class KafkaSetup {
@@ -30,6 +31,7 @@ public class KafkaSetup {
 
     @PostConstruct
     public void kafkaTemplates() {
+        logger.info("setting up kafka producers");
         for (String key : kafkaConfigProperties.getEvents().keySet()) {
             var properties = kafkaConfigProperties.getEvents().get(key).getKafka();
             logger.info("setting up kafka producer for '{}' events using brokers: {}", key, properties.getBrokers());

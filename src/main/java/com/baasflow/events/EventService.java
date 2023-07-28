@@ -11,6 +11,10 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.function.Function;
 
+/**
+ * This class represents the EventService, which is a service responsible for sending event messages.
+ * It provides methods for sending audit log and event messages.
+ */
 @Service
 public class EventService {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
