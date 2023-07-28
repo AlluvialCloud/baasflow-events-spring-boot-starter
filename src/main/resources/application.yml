@@ -1,0 +1,15 @@
+baasflow:
+    events:
+        auditlog:
+            kafka:
+                brokers: <override from environment specific configuration>
+                topic: <override from environment specific configuration>
+        generic:
+            kafka:
+                brokers: <override from environment specific configuration>
+                topic: <override from environment specific configuration>
+spring:
+    kafka:
+        producer:
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer

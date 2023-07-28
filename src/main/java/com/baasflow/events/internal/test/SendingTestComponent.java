@@ -1,4 +1,4 @@
-package com.baasflow.events;
+package com.baasflow.events.internal.test;
 
 import com.baasflow.events.EventService;
 import com.baasflow.events.EventStatus;
@@ -16,7 +16,7 @@ public class SendingTestComponent implements CommandLineRunner {
     @Autowired
     EventService eventService;
 
-    @Value("${auditlog.testing:false}")
+    @Value("${baasflow.events.testing:false}")
     boolean testing;
 
     @Override
@@ -28,8 +28,11 @@ public class SendingTestComponent implements CommandLineRunner {
             while (true) {
                 logger.info("sending sample event to kafka");
                 int count = (int) (Math.random() * 10000);
-                eventService.sendAuditlog("source" + count, "event" + count, Math.random() > 0.3 ? EventStatus.success : EventStatus.failure);
-
+                if (count %2 == 0) {
+                    eventService.sendAuditlog("source" + count, "event" + count, Math.random() > 0.3 ? EventStatus.success : EventStatus.failure);
+                } else {
+                    eventService.sendEvent("source" + count, "event" + count, Math.random() > 0.3 ? EventStatus.success : EventStatus.failure, "payload" + count", "payload" + count);
+                }
                 Thread.sleep(5000);
             }
         }

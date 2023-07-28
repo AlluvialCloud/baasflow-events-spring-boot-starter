@@ -27,8 +27,8 @@ public class EventService {
      * This method is a convenience method for calling the sendAuditlog method with a null eventData parameter.
      *
      * @param sourceModule the source module of the audit log
-     * @param event the event of the audit log
-     * @param eventStatus the status of the event
+     * @param event        the event of the audit log
+     * @param eventStatus  the status of the event
      */
     public void sendAuditlog(String sourceModule, String event, EventStatus eventStatus) {
         this.sendAuditlog(sourceModule, event, eventStatus, null);
@@ -37,10 +37,10 @@ public class EventService {
     /**
      * Sends an audit log event with the specified source module, event, event status, and correlation IDs.
      *
-     * @param sourceModule     the source module that generated the audit log event
-     * @param event            the event description or name
-     * @param eventStatus      the status of the event (e.g., success, failure)
-     * @param correlationIds   a map of correlation IDs associated with the event
+     * @param sourceModule   the source module that generated the audit log event
+     * @param event          the event description or name
+     * @param eventStatus    the status of the event (e.g., success, failure)
+     * @param correlationIds a map of correlation IDs associated with the event
      */
     public void sendAuditlog(String sourceModule, String event, EventStatus eventStatus, Map<CharSequence, CharSequence> correlationIds) {
         Event eventMessage = builder.auditlogEvent(sourceModule, event, eventStatus, correlationIds);
@@ -61,11 +61,11 @@ public class EventService {
      * Sends an event message using the provided parameters.
      *
      * @param sourceModule the source module of the event
-     * @param event the name of the event
-     * @param eventType the type of the event
-     * @param eventStatus the status of the event
-     * @param payload the payload of the event
-     * @param payloadType the type of the payload
+     * @param event        the name of the event
+     * @param eventType    the type of the event
+     * @param eventStatus  the status of the event
+     * @param payload      the payload of the event
+     * @param payloadType  the type of the payload
      */
     public void sendEvent(String sourceModule, String event, EventType eventType, EventStatus eventStatus, String payload, String payloadType) {
         this.sendEvent(sourceModule, event, eventType, eventStatus, payload, payloadType, null);
@@ -74,12 +74,12 @@ public class EventService {
     /**
      * Sends an event message using the provided parameters.
      *
-     * @param sourceModule the source module of the event
-     * @param event the name of the event
-     * @param eventType the type of the event
-     * @param eventStatus the status of the event
-     * @param payload the payload of the event
-     * @param payloadType the type of the payload
+     * @param sourceModule   the source module of the event
+     * @param event          the name of the event
+     * @param eventType      the type of the event
+     * @param eventStatus    the status of the event
+     * @param payload        the payload of the event
+     * @param payloadType    the type of the payload
      * @param correlationIds the correlation IDs to associate with the event
      */
     public void sendEvent(String sourceModule, String event, EventType eventType, EventStatus eventStatus, String payload, String payloadType, Map<CharSequence, CharSequence> correlationIds) {

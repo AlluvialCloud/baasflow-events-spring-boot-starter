@@ -1,0 +1,16 @@
+baasflow:
+    events:
+        testing: true
+        auditlog:
+            kafka:
+                brokers: localhost:9092
+                topic: auditlog
+        generic:
+            kafka:
+                brokers: localhost:9092
+                topic: events
+spring:
+    kafka:
+        producer:
+            key-serializer: org.apache.kafka.common.serialization.StringSerializer
+            value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
