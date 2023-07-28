@@ -1,8 +1,6 @@
 package com.baasflow.events.internal;
 
-import com.baasflow.events.internal.KafkaConfigProperties;
 import jakarta.annotation.PostConstruct;
-import jakarta.annotation.Priority;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
