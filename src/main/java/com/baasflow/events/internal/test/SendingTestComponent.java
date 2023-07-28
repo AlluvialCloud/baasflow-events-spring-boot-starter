@@ -27,7 +27,6 @@ public class SendingTestComponent implements CommandLineRunner {
             Thread.sleep(1000);
 
             while (true) {
-                logger.info("sending sample event to kafka");
                 int count = (int) (Math.random() * 10000);
                 if (count %2 == 0) {
                     eventService.sendAuditlog("source" + count, "event" + count, Math.random() > 0.3 ? EventStatus.success : EventStatus.failure);
