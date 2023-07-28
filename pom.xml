@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
-
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
@@ -21,6 +20,7 @@
         <java.version>17</java.version>
         <lombok.version>1.18.28</lombok.version>
         <avro.version>1.11.2</avro.version>
+        <picocli.version>4.7.4</picocli.version>
     </properties>
 
     <dependencies>
@@ -31,6 +31,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>info.picocli</groupId>
+            <artifactId>picocli</artifactId>
+            <version>${picocli.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.kafka</groupId>
@@ -61,6 +66,7 @@
     </dependencies>
 
     <build>
+        <finalName>events-cli</finalName><!-- this will not affect mvn install/deploy -->
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -99,6 +105,13 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.baasflow.events.cli.Runner</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>

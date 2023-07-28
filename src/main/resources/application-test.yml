@@ -1,6 +1,6 @@
 baasflow:
     events:
-        auditlog:
+        audit:
             kafka:
                 brokers: "localhost:9092"
                 topic: auditlog

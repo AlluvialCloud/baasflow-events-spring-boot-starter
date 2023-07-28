@@ -1,13 +1,13 @@
 baasflow:
     events:
-        -   auditlog:
-                kafka:
-                    brokers: <override from environment specific configuration>
-                    topic: <override from environment specific configuration>
-        -   generic:
-                kafka:
-                    brokers: <override from environment specific configuration>
-                    topic: <override from environment specific configuration>
+        audit:
+            kafka:
+                brokers: <override from environment specific configuration>
+                topic: <override from environment specific configuration>
+        generic:
+            kafka:
+                brokers: <override from environment specific configuration>
+                topic: <override from environment specific configuration>
 spring:
     kafka:
         producer:
