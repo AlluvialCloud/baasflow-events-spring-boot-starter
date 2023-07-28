@@ -2,6 +2,7 @@ package com.baasflow.events.internal.test;
 
 import com.baasflow.events.EventService;
 import com.baasflow.events.EventStatus;
+import com.baasflow.events.EventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class SendingTestComponent implements CommandLineRunner {
                 if (count %2 == 0) {
                     eventService.sendAuditlog("source" + count, "event" + count, Math.random() > 0.3 ? EventStatus.success : EventStatus.failure);
                 } else {
-                    eventService.sendEvent("source" + count, "event" + count, Math.random() > 0.3 ? EventStatus.success : EventStatus.failure, "payload" + count", "payload" + count);
+                    eventService.sendEvent("source" + count, "event" + count, EventType.business, Math.random() > 0.3 ? EventStatus.success : EventStatus.failure, "payload" + count, "payload" + count);
                 }
                 Thread.sleep(5000);
             }
