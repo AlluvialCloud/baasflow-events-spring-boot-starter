@@ -125,6 +125,15 @@
         "string"
       ],
       "default": null
+    },
+    {
+      "name": "tenantId",
+      "doc": "The ID of the tenant that the event belongs to.",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
     }
   ]
 }
