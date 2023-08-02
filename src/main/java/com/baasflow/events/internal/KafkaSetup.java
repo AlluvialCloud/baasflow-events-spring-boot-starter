@@ -17,10 +17,10 @@ import java.util.HashMap;
 public class KafkaSetup {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Value("${spring.kafka.producer.key-serializer}")
+    @Value("${spring.kafka.producer.key-serializer:org.apache.kafka.common.serialization.StringSerializer}")
     String keySerializer;
 
-    @Value("${spring.kafka.producer.value-serializer}")
+    @Value("${spring.kafka.producer.value-serializer:org.apache.kafka.common.serialization.ByteArraySerializer}")
     String valueSerializer;
 
     @Autowired
