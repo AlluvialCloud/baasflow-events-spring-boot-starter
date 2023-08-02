@@ -123,7 +123,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>com.baasflow.events.cli.Runner</mainClass>
+                    <mainClass>com.baasflow.eventscli.Runner</mainClass>
                 </configuration>
                 <executions>
                     <execution>

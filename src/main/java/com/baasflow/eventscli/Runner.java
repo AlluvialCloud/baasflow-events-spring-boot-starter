@@ -1,4 +1,4 @@
-package com.baasflow.events.cli;
+package com.baasflow.eventscli;
 
 import com.baasflow.events.EventLogLevel;
 import com.baasflow.events.EventService;
