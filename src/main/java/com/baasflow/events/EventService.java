@@ -46,7 +46,7 @@ public class EventService {
      * @param eventStatus    the status of the event (e.g., success, failure)
      * @param correlationIds a map of correlation IDs associated with the event
      */
-    public void sendAuditlog(String sourceModule, String event, EventStatus eventStatus, Map<CharSequence, CharSequence> correlationIds) {
+    public void sendAuditlog(String sourceModule, String event, EventStatus eventStatus, Map<String, String> correlationIds) {
         Event eventMessage = builder.auditlogEvent(sourceModule, event, eventStatus, correlationIds);
         send(eventMessage);
     }
@@ -86,7 +86,7 @@ public class EventService {
      * @param payloadType    the type of the payload
      * @param correlationIds the correlation IDs to associate with the event
      */
-    public void sendEvent(String sourceModule, String event, EventType eventType, EventStatus eventStatus, String payload, String payloadType, Map<CharSequence, CharSequence> correlationIds) {
+    public void sendEvent(String sourceModule, String event, EventType eventType, EventStatus eventStatus, String payload, String payloadType, Map<String, String> correlationIds) {
         Event eventMessage = builder.event(sourceModule, event, eventType, eventStatus, payload, payloadType, correlationIds);
         send(eventMessage);
     }

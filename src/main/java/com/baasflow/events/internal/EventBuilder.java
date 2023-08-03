@@ -17,7 +17,7 @@ public class EventBuilder {
         return this.auditlogEvent(sourceModule, event, eventStatus, null);
     }
 
-    public Event auditlogEvent(String sourceModule, String event, EventStatus eventStatus, Map<CharSequence, CharSequence> correlationIds) {
+    public Event auditlogEvent(String sourceModule, String event, EventStatus eventStatus, Map<String,String> correlationIds) {
         return createEventBuilder()
                 .setEvent(event)
                 .setEventLogLevel(EventLogLevel.INFO)
@@ -28,7 +28,7 @@ public class EventBuilder {
                 .build();
     }
 
-    public Event event(String sourceModule, String event, EventType eventType, EventStatus eventStatus, String payload, String payloadType, Map<CharSequence, CharSequence> correlationIds) {
+    public Event event(String sourceModule, String event, EventType eventType, EventStatus eventStatus, String payload, String payloadType, Map<String, String> correlationIds) {
         return createEventBuilder()
                 .setEvent(event)
                 .setEventLogLevel(EventLogLevel.INFO)
