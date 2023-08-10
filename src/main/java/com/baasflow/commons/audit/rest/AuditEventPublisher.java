@@ -1,6 +1,5 @@
 package com.baasflow.commons.audit.rest;
 
-import com.baasflow.commons.audit.rest.interceptor.CommonNames;
 import com.baasflow.commons.events.EventLogLevel;
 import com.baasflow.commons.events.EventStatus;
 import com.baasflow.commons.events.EventType;
