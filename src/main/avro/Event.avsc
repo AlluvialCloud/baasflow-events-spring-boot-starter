@@ -1,6 +1,6 @@
 {
   "name": "Event",
-  "namespace": "com.baasflow.events",
+  "namespace": "com.baasflow.commons.events",
   "type": "record",
   "fields": [
     {

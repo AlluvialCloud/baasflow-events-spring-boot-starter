@@ -1,1 +1,1 @@
-com.baasflow.events.EventServiceAutoConfiguration
+com.baasflow.commons.events.EventServiceAutoConfiguration

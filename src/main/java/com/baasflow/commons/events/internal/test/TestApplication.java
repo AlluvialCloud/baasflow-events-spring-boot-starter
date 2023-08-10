@@ -1,10 +1,10 @@
-package com.baasflow.events.internal.test;
+package com.baasflow.commons.events.internal.test;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
-@SpringBootApplication(scanBasePackages = {"com.baasflow.events"})
+@SpringBootApplication(scanBasePackages = "com.baasflow.commons.events")
 public class TestApplication {
 
     public static void main(String[] args) {

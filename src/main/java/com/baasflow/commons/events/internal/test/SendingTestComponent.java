@@ -1,8 +1,8 @@
-package com.baasflow.events.internal.test;
+package com.baasflow.commons.events.internal.test;
 
-import com.baasflow.events.EventService;
-import com.baasflow.events.EventStatus;
-import com.baasflow.events.EventType;
+import com.baasflow.commons.events.EventService;
+import com.baasflow.commons.events.EventStatus;
+import com.baasflow.commons.events.EventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,6 +1,6 @@
-package com.baasflow.events.internal;
+package com.baasflow.commons.events.internal;
 
-import com.baasflow.events.Event;
+import com.baasflow.commons.events.Event;
 import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,9 +1,9 @@
-package com.baasflow.eventscli;
+package com.baasflow.commons.eventscli;
 
-import com.baasflow.events.EventLogLevel;
-import com.baasflow.events.EventService;
-import com.baasflow.events.EventStatus;
-import com.baasflow.events.EventType;
+import com.baasflow.commons.events.EventLogLevel;
+import com.baasflow.commons.events.EventService;
+import com.baasflow.commons.events.EventStatus;
+import com.baasflow.commons.events.EventType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.Banner;
 import org.springframework.boot.CommandLineRunner;

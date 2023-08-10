@@ -1,7 +1,7 @@
-package com.baasflow.events;
+package com.baasflow.commons.events;
 
-import com.baasflow.events.internal.EventBuilder;
-import com.baasflow.events.internal.KafkaSender;
+import com.baasflow.commons.events.internal.EventBuilder;
+import com.baasflow.commons.events.internal.KafkaSender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

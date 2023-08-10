@@ -1,5 +1,5 @@
 baasflow:
-    events:
+    commons.events:
         kafka:
             producer:
                 key-serializer: org.apache.kafka.common.serialization.StringSerializer
