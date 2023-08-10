@@ -94,7 +94,7 @@ public class AuditSecurityEventContext {
     return ObjectUtils.firstNonNull(auditVariable, pathVariable, requestParam, requestHeader, paramName);
   }
 
-  public void collectCorrelationIDsFromResult(@Nullable final Object methodCallResult) throws ExecutionException, InterruptedException {
+  public void collectCorrelationIDsFromResult(@Nullable final Object methodCallResult) throws Exception {
     this.postHandled = true;
     final var resultObject = extractResultObject(methodCallResult);
     if (null == resultObject) {
@@ -112,14 +112,20 @@ public class AuditSecurityEventContext {
   }
 
   @CheckForNull
-  private Object extractResultObject(final Object methodCallResult) throws InterruptedException, ExecutionException {
+  private Object extractResultObject(final Object methodCallResult) throws Exception {
     final Object proceed;
     if (methodCallResult instanceof final CompletableFuture completableFuture) {
       try {
         proceed = completableFuture.get();
       } catch (final Exception e) {
-        extractProblemDetail(e);
-        throw e;
+        if (e instanceof ExecutionException) {
+          var cause = e.getCause();
+          extractProblemDetail(cause);
+          throw (Exception)cause;
+        } else {
+          extractProblemDetail(e);
+          throw e;
+        }
       }
     } else {
       proceed = methodCallResult;
@@ -137,7 +143,7 @@ public class AuditSecurityEventContext {
     return resultObject;
   }
 
-  public void extractProblemDetail(final Exception e) {
+  public void extractProblemDetail(final Throwable e) {
     if (e instanceof final ErrorResponse errorResponse) {
       // TODO Check: ProblemDetail has a same status code?
       // context.setStatusCode(errorResponse.getStatusCode().value());
