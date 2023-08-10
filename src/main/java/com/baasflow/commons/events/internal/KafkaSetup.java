@@ -1,4 +1,4 @@
-package com.baasflow.events.internal;
+package com.baasflow.commons.events.internal;
 
 import jakarta.annotation.PostConstruct;
 import org.apache.kafka.clients.producer.ProducerConfig;

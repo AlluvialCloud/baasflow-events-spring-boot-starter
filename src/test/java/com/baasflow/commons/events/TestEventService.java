@@ -1,6 +1,6 @@
-package com.baasflow.events;
+package com.baasflow.commons.events;
 
-import com.baasflow.events.internal.KafkaSender;
+import com.baasflow.commons.events.internal.KafkaSender;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
