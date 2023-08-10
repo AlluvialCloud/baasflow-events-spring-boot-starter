@@ -10,7 +10,7 @@ import java.util.Map;
 
 @Data
 @NoArgsConstructor
-@ConfigurationProperties(prefix = "baasflow")
+@ConfigurationProperties(prefix = "baasflow.commons")
 public class KafkaConfigProperties {
     private Map<String, Event> events;
 
