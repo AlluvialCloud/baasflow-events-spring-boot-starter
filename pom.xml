@@ -10,8 +10,8 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.baasflow.comons.events</groupId>
-    <artifactId>baasflow-commons-events-spring-boot-starter</artifactId>
+    <groupId>com.baasflow.events</groupId>
+    <artifactId>baasflow-events-spring-boot-starter</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <name>baasflow-commons-events-spring-boot-starter</name>
     <description>BaaSFlow commons events implementation</description>
