@@ -8,8 +8,10 @@ import jakarta.annotation.Nullable;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.stream.IntStream;
@@ -52,7 +54,7 @@ public class AuditSecurityEventContext {
   private String sourceModule;
   private int statusCode;
   private boolean isSuccess;
-  private Map<String, String> params = new HashMap<>();
+  private Map<String, Set<String>> params = new HashMap<>();
   private Object requestObject;
   private Object responseObject;
   private ProblemDetail problemDetail;
@@ -76,7 +78,7 @@ public class AuditSecurityEventContext {
           final var parameter = parameters[index];
           final var auditParamName = getAuditParamName(parameter);
           final var value = String.valueOf(args[index]);
-          corrParameters.put(auditParamName, value);
+          appendParamIfValueIsNotNull(auditParamName, value);
           final var addToMDC = Optional.ofNullable(parameter.getAnnotation(Audit.class)).map(Audit::addToMDC).orElse(false);
           if (addToMDC) {
             MDC.put(auditParamName, value);
@@ -106,7 +108,7 @@ public class AuditSecurityEventContext {
       final var correlationParameters = correlationParamsProvider.correlationParams();
 
       if (ObjectUtils.isNotEmpty(correlationParameters)) {
-        this.params.putAll(correlationParameters);
+        correlationParameters.forEach((key, value) -> appendParamIfValueIsNotNull(key, value));
       }
     }
   }
@@ -121,7 +123,7 @@ public class AuditSecurityEventContext {
         if (e instanceof ExecutionException) {
           var cause = e.getCause();
           extractProblemDetail(cause);
-          throw (Exception)cause;
+          throw (Exception) cause;
         } else {
           extractProblemDetail(e);
           throw e;
@@ -179,9 +181,12 @@ public class AuditSecurityEventContext {
    * @return the original AuditSecurityEventContext object
    */
   public AuditSecurityEventContext appendParamIfValueIsNotNull(final String key, final String value) {
-    if (null != value) {
-      this.params.put(key, value);
+    if (null == value) {
+      return this;
     }
+
+    var list = this.params.computeIfAbsent(key, missingKey -> new HashSet<>());
+    list.add(value);
     return this;
   }
 }

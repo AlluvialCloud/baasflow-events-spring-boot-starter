@@ -7,6 +7,8 @@ import com.baasflow.commons.events.EventStatus;
 import com.baasflow.commons.events.EventType;
 import io.swagger.v3.oas.annotations.Operation;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -47,7 +49,15 @@ public class AuditSecurityEventMapper {
     to.setEventLogLevel(orWarn(from.getEventLogLevel()));
     to.setStatusCode(from.getStatusCode());
     to.setEventStatus(from.isSuccess() ? EventStatus.success : EventStatus.failure);
-    to.setParams(new HashMap<>(from.getParams()));
+    to.setParams(convertListSetToMap(from.getParams()));
+  }
+
+  private Map<String, String> convertListSetToMap(Map<String, Set<String>> params) {
+    var map = new HashMap<String, String>();
+    for (var entry : params.entrySet()) {
+      map.put(entry.getKey(), String.join(",", entry.getValue()));
+    }
+    return map;
   }
 
   private String orUnknown(final String value) {

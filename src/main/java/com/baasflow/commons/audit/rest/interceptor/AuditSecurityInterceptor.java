@@ -247,12 +247,9 @@ public class AuditSecurityInterceptor implements HandlerInterceptor, ResponseBod
       return;
     }
 
-    final var contextParams = context.getParams();
     for (final var headerName : auditHeaderNames) {
       final var headerValue = request.getHeader(headerName);
-      if (null != headerValue) {
-        contextParams.put(headerName, headerValue);
-      }
+      context.appendParamIfValueIsNotNull(headerName, headerValue);
     }
   }
 
