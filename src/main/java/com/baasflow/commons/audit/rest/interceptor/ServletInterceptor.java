@@ -1,8 +1,7 @@
 package com.baasflow.commons.audit.rest.interceptor;
 
-import com.baasflow.commons.audit.rest.AuditSecurityEvent;
+import com.baasflow.commons.audit.rest.ServletEvent;
 import com.baasflow.commons.audit.rest.ServletEventPublisher;
-import com.baasflow.commons.audit.rest.ServletEventPublisher.ServletEvent;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
@@ -120,7 +119,7 @@ public class ServletInterceptor implements HandlerInterceptor, ResponseBodyAdvic
     }
 
     final var method = handlerMethod.getMethod();
-    final var auditSecurityAnnotation = method.getAnnotation(AuditSecurityEvent.class);
+    final var auditSecurityAnnotation = method.getAnnotation(ServletEvent.class);
     // if it's not annotated with `AuditSecurityEvent`, then ignore
     if (null == auditSecurityAnnotation) {
       log.trace("END: preHandle: not annotated with AuditSecurityEvent");
@@ -171,7 +170,7 @@ public class ServletInterceptor implements HandlerInterceptor, ResponseBodyAdvic
     return null;
   }
 
-  @Around("@annotation(com.baasflow.commons.audit.rest.AuditSecurityEvent)")
+  @Around("@annotation(com.baasflow.commons.audit.rest.ServletEvent)")
   public Object handleAnnotatedMethodCall(final ProceedingJoinPoint joinPoint) throws Throwable {
     log.trace("START: handleAnnotatedMethodCall");
 
@@ -259,7 +258,7 @@ public class ServletInterceptor implements HandlerInterceptor, ResponseBodyAdvic
     }
 
     final var method = methodSignature.getMethod();
-    final var auditSecurityEventAnnotation = method.getAnnotation(AuditSecurityEvent.class);
+    final var auditSecurityEventAnnotation = method.getAnnotation(ServletEvent.class);
     // BTW If not exists how called???
     if (null == auditSecurityEventAnnotation) {
       return;
@@ -273,7 +272,7 @@ public class ServletInterceptor implements HandlerInterceptor, ResponseBodyAdvic
 
   private void publishEvent() {
     // Send message to event publisher
-    final var securityEventType = new ServletEvent();
+    final var securityEventType = new ServletEventPublisher.ServletEvent();
     mapper.toServletEvent(context, securityEventType);
     auditEventPublisher.publish(securityEventType);
   }

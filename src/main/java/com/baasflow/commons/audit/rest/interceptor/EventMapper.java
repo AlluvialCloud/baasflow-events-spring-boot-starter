@@ -1,7 +1,7 @@
 package com.baasflow.commons.audit.rest.interceptor;
 
-import com.baasflow.commons.audit.rest.AuditSecurityEvent;
-import com.baasflow.commons.audit.rest.ServletEventPublisher.ServletEvent;
+import com.baasflow.commons.audit.rest.ServletEvent;
+import com.baasflow.commons.audit.rest.ServletEventPublisher;
 import com.baasflow.commons.events.EventLogLevel;
 import com.baasflow.commons.events.EventStatus;
 import com.baasflow.commons.events.EventType;
@@ -21,7 +21,7 @@ public class EventMapper {
 
   public static final String UNKNOWN = "unknown";
 
-  public void toServletEventContext(final AuditSecurityEvent from, @Nullable final Operation openApiOperation,
+  public void toServletEventContext(final ServletEvent from, @Nullable final Operation openApiOperation,
       final ServletEventContext to) {
     to.setOperationId(determineOperationId(from, openApiOperation));
     to.setDomains(from.domains());
@@ -31,7 +31,7 @@ public class EventMapper {
     to.setPayloadType(StringUtils.trimToNull(from.payloadType()));
   }
 
-  private static String determineOperationId(final AuditSecurityEvent from, @Nullable final Operation openApiOperation) {
+  private static String determineOperationId(final ServletEvent from, @Nullable final Operation openApiOperation) {
     final var auditOperationId = StringUtils.trimToNull(from.operationId());
     final var openApiOperationId = (null == openApiOperation) ? null : StringUtils.trimToNull(openApiOperation.operationId());
     final var operationId = ObjectUtils.firstNonNull(auditOperationId, openApiOperationId, UNKNOWN);
@@ -41,7 +41,7 @@ public class EventMapper {
     return operationId;
   }
 
-  public void toServletEvent(final ServletEventContext from, final ServletEvent to) {
+  public void toServletEvent(final ServletEventContext from, final ServletEventPublisher.ServletEvent to) {
     to.setTenantId(orUnknown(from.getTenant()));
     to.setOperationId(orUnknown(from.getOperationId()));
     to.setDomains(orUnknown(from.getDomains()));

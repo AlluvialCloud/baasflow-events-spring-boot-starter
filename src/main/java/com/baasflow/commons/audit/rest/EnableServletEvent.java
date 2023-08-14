@@ -17,6 +17,6 @@ import org.springframework.context.annotation.Import;
 @Target(ElementType.TYPE)
 @Documented
 @Import(ServletInterceptorConfig.class)
-public @interface EnableAuditEvent {
+public @interface EnableServletEvent {
 
 }
