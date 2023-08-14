@@ -1,17 +1,21 @@
 package com.baasflow.commons.audit.rest.interceptor;
 
-import com.baasflow.commons.audit.rest.AuditEventPublisher;
 import com.baasflow.commons.audit.rest.AuditSecurityEvent;
+import com.baasflow.commons.audit.rest.ServletEventPublisher;
+import com.baasflow.commons.audit.rest.ServletEventPublisher.ServletEvent;
 import jakarta.annotation.Nullable;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 import javax.annotation.CheckForNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,11 +28,17 @@ import org.slf4j.MDC;
 import org.springframework.aop.aspectj.MethodInvocationProceedingJoinPoint;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
@@ -49,7 +59,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 @Component
 @Aspect
 @Slf4j
-public class AuditSecurityInterceptor implements HandlerInterceptor, ResponseBodyAdvice {
+public class ServletInterceptor implements HandlerInterceptor, ResponseBodyAdvice {
 
   public static final String X_TRACKING_ID = "X-Tracking-Id";
   public static final String REQUEST_X_TRACKING_ID = "request.TrackingId";
@@ -62,10 +72,27 @@ public class AuditSecurityInterceptor implements HandlerInterceptor, ResponseBod
   @Value("${app.tenant.http-header-name:X-baasflow-tenant-id}")
   private final String tenantHttpHeaderName;
 
-  private final AuditSecurityEventContext context;
+  private final ServletEventContext context;
 
-  private final AuditEventPublisher auditEventPublisher;
-  private final AuditSecurityEventMapper mapper;
+  private final ServletEventPublisher auditEventPublisher;
+  private final EventMapper mapper;
+
+  @CheckForNull
+  private static MethodSignature getMethodSignature(final ProceedingJoinPoint joinPoint) {
+    if (joinPoint instanceof final MethodSignature instance) {
+      return instance;
+    }
+
+    // Handle CompletableFuture based return type method calls
+    if (joinPoint instanceof final MethodInvocationProceedingJoinPoint proceedingJoinPoint) {
+      final var signature = proceedingJoinPoint.getSignature();
+      if (signature instanceof final MethodSignature instance) {
+        return instance;
+      }
+    }
+
+    return null;
+  }
 
   @PostConstruct
   public void init() {
@@ -83,6 +110,8 @@ public class AuditSecurityInterceptor implements HandlerInterceptor, ResponseBod
     }
 
     initializeMDCAndAuditIDs(request);
+    context.setRequestMethod(request.getMethod());
+    context.setRequestURI(request.getRequestURI());
 
     // if it's not a `HandlerMethod`, then ignore
     if (!(object instanceof final HandlerMethod handlerMethod)) {
@@ -97,8 +126,16 @@ public class AuditSecurityInterceptor implements HandlerInterceptor, ResponseBod
       log.trace("END: preHandle: not annotated with AuditSecurityEvent");
       return true;
     }
+    String produces = getProduces(method);
+    if (null != produces) {
+      context.setProduces(produces);
+      log.info("Produces: {}", produces);
+    } else {
+      log.warn("No @RequestMapping annotation found on method: {}", method);
+    }
+
     context.setPreHandled(true);
-    request.setAttribute(AuditSecurityEventContext.class.getName(), context);
+    request.setAttribute(ServletEventContext.class.getName(), context);
 
     populateAuditHeaders(request, auditSecurityAnnotation.headerNames());
 
@@ -109,6 +146,29 @@ public class AuditSecurityInterceptor implements HandlerInterceptor, ResponseBod
 
     log.trace("XXX: END: preHandle");
     return true;
+  }
+
+  private String getProduces(Method method) {
+    var produces = Stream.<Supplier<String[]>>of(
+            () -> Optional.ofNullable(AnnotationUtils.findAnnotation(method, GetMapping.class)).map(GetMapping::produces).orElse(null),
+            () -> Optional.ofNullable(AnnotationUtils.findAnnotation(method, PostMapping.class)).map(PostMapping::produces).orElse(null),
+            () -> Optional.ofNullable(AnnotationUtils.findAnnotation(method, PutMapping.class)).map(PutMapping::produces).orElse(null),
+            () -> Optional.ofNullable(AnnotationUtils.findAnnotation(method, PatchMapping.class)).map(PatchMapping::produces).orElse(null),
+            () -> Optional.ofNullable(AnnotationUtils.findAnnotation(method, DeleteMapping.class)).map(DeleteMapping::produces).orElse(null))
+        .map(Supplier::get)
+        .filter(Objects::nonNull)
+        .findFirst()
+        .orElse(null);
+
+    if (produces != null && produces.length > 0) {
+      var prodcucesStr = produces[0];
+      log.info("Produces: {}", prodcucesStr);
+      return prodcucesStr;
+    } else {
+      log.warn("No produces attribute or @Mapping based annotation found on method: {}", method);
+    }
+
+    return null;
   }
 
   @Around("@annotation(com.baasflow.commons.audit.rest.AuditSecurityEvent)")
@@ -122,6 +182,7 @@ public class AuditSecurityInterceptor implements HandlerInterceptor, ResponseBod
     final Object jointPointResult;
     try {
       jointPointResult = joinPoint.proceed();
+      context.setResponseObject(jointPointResult);
     } catch (final Exception e) {
       context.extractProblemDetail(e);
       throw e;
@@ -132,7 +193,6 @@ public class AuditSecurityInterceptor implements HandlerInterceptor, ResponseBod
     log.trace("END: handleAnnotatedMethodCall");
     return jointPointResult;
   }
-
 
   /**
    * Handle ProblemDetail if {@link org.springframework.web.bind.annotation.ControllerAdvice} is used.
@@ -205,35 +265,17 @@ public class AuditSecurityInterceptor implements HandlerInterceptor, ResponseBod
       return;
     }
     final var openApiOperation = method.getAnnotation(io.swagger.v3.oas.annotations.Operation.class);
-    mapper.toAuditSecurityEventContext(auditSecurityEventAnnotation, openApiOperation, context);
+    mapper.toServletEventContext(auditSecurityEventAnnotation, openApiOperation, context);
 
     final var args = joinPoint.getArgs();
     context.populateAuditInfoFromMethodParams(method, args);
   }
 
-  @CheckForNull
-  private static MethodSignature getMethodSignature(final ProceedingJoinPoint joinPoint) {
-    if (joinPoint instanceof final MethodSignature instance) {
-      return instance;
-    }
-
-    // Handle CompletableFuture based return type method calls
-    if (joinPoint instanceof final MethodInvocationProceedingJoinPoint proceedingJoinPoint) {
-      final var signature = proceedingJoinPoint.getSignature();
-      if (signature instanceof final MethodSignature instance) {
-        return instance;
-      }
-    }
-
-    return null;
-  }
-
   private void publishEvent() {
     // Send message to event publisher
-    final var securityEventType = new AuditEventPublisher.SecurityEventType();
-    mapper.toSecurityEventType(context, securityEventType);
-    final var mdcContextMap = MDC.getCopyOfContextMap();
-    auditEventPublisher.publish(securityEventType, mdcContextMap);
+    final var securityEventType = new ServletEvent();
+    mapper.toServletEvent(context, securityEventType);
+    auditEventPublisher.publish(securityEventType);
   }
 
   /**

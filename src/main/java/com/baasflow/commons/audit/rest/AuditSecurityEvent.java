@@ -27,4 +27,6 @@ public @interface AuditSecurityEvent {
    * @return an array of header names
    */
   String[] headerNames() default {};
+
+  String payloadType() default "";
 }

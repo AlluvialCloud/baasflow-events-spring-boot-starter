@@ -37,7 +37,7 @@ import org.springframework.web.context.annotation.RequestScope;
 @RequestScope
 @Data
 @Accessors(chain = true)
-public class AuditSecurityEventContext {
+public class ServletEventContext {
 
   @Value("${app.audit.logging.module-name:}")
   private final String defaultSourceModule;
@@ -57,13 +57,19 @@ public class AuditSecurityEventContext {
   private Map<String, Set<String>> params = new HashMap<>();
   private Object requestObject;
   private Object responseObject;
+  private String payloadType;
   private ProblemDetail problemDetail;
+  private String requestMethod;
+  private String requestURI;
+  private long startTime = System.nanoTime();
+  private String produces;
 
-  public AuditSecurityEventContext setFromProblemDetail(final ProblemDetail problemDetail) {
+  public ServletEventContext setFromProblemDetail(final ProblemDetail problemDetail) {
     this.problemDetail = problemDetail;
     this.statusCode = problemDetail.getStatus();
     this.isSuccess = false;
     this.postHandled = true;
+    this.payloadType = "problemDetail";
     return this;
   }
 
@@ -108,7 +114,7 @@ public class AuditSecurityEventContext {
       final var correlationParameters = correlationParamsProvider.correlationParams();
 
       if (ObjectUtils.isNotEmpty(correlationParameters)) {
-        correlationParameters.forEach((key, value) -> appendParamIfValueIsNotNull(key, value));
+        correlationParameters.forEach(this::appendParamIfValueIsNotNull);
       }
     }
   }
@@ -180,7 +186,7 @@ public class AuditSecurityEventContext {
    * @param value the value of the parameter
    * @return the original AuditSecurityEventContext object
    */
-  public AuditSecurityEventContext appendParamIfValueIsNotNull(final String key, final String value) {
+  public ServletEventContext appendParamIfValueIsNotNull(final String key, final String value) {
     if (null == value) {
       return this;
     }

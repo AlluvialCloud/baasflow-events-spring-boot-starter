@@ -1,7 +1,7 @@
 package com.baasflow.commons.audit.rest.interceptor;
 
 import com.baasflow.commons.audit.rest.AuditSecurityEvent;
-import com.baasflow.commons.audit.rest.AuditEventPublisher.SecurityEventType;
+import com.baasflow.commons.audit.rest.ServletEventPublisher.ServletEvent;
 import com.baasflow.commons.events.EventLogLevel;
 import com.baasflow.commons.events.EventStatus;
 import com.baasflow.commons.events.EventType;
@@ -17,17 +17,18 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class AuditSecurityEventMapper {
+public class EventMapper {
 
   public static final String UNKNOWN = "unknown";
 
-  public void toAuditSecurityEventContext(final AuditSecurityEvent from, @Nullable final Operation openApiOperation,
-      final AuditSecurityEventContext to) {
+  public void toServletEventContext(final AuditSecurityEvent from, @Nullable final Operation openApiOperation,
+      final ServletEventContext to) {
     to.setOperationId(determineOperationId(from, openApiOperation));
     to.setDomains(from.domains());
     to.setEventType(from.eventType());
     to.setSourceModule(from.sourceModule());
     to.setEventLogLevel(from.eventLogLevel());
+    to.setPayloadType(StringUtils.trimToNull(from.payloadType()));
   }
 
   private static String determineOperationId(final AuditSecurityEvent from, @Nullable final Operation openApiOperation) {
@@ -40,7 +41,7 @@ public class AuditSecurityEventMapper {
     return operationId;
   }
 
-  public void toSecurityEventType(final AuditSecurityEventContext from, final SecurityEventType to) {
+  public void toServletEvent(final ServletEventContext from, final ServletEvent to) {
     to.setTenantId(orUnknown(from.getTenant()));
     to.setOperationId(orUnknown(from.getOperationId()));
     to.setDomains(orUnknown(from.getDomains()));
@@ -49,7 +50,23 @@ public class AuditSecurityEventMapper {
     to.setEventLogLevel(orWarn(from.getEventLogLevel()));
     to.setStatusCode(from.getStatusCode());
     to.setEventStatus(from.isSuccess() ? EventStatus.success : EventStatus.failure);
-    to.setParams(convertListSetToMap(from.getParams()));
+    to.setCorrelationIds(convertListSetToMap(from.getParams()));
+    to.setPayload(from.getResponseObject());
+    final var payloadType = from.getPayloadType();
+    if (null != payloadType) {
+      to.setPayloadType(payloadType);
+    } else {
+      var resultObject = from.getResponseObject();
+      if (null != resultObject) {
+        to.setPayloadType(resultObject.getClass().getName());
+      }
+    }
+    to.setRequestMethod(from.getRequestMethod());
+    to.setRequestURI(from.getRequestURI());
+    to.setProduces(from.getProduces());
+
+
+    to.setTookNano(System.nanoTime() - from.getStartTime());
   }
 
   private Map<String, String> convertListSetToMap(Map<String, Set<String>> params) {

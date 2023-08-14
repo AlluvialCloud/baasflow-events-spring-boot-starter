@@ -17,7 +17,7 @@ public class SendingTestComponent implements CommandLineRunner {
     @Autowired
     EventService eventService;
 
-    @Value("${baasflow.events.testing:false}")
+    @Value("${baasflow.comons.events.testing:false}")
     boolean testing;
 
     @Override

@@ -8,13 +8,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @RequiredArgsConstructor
 @Configuration
-public class AuditRestInterceptorConfig implements WebMvcConfigurer {
+public class ServletInterceptorConfig implements WebMvcConfigurer {
 
-  private final AuditSecurityInterceptor logInterceptor;
+  private final ServletInterceptor interceptor;
 
   @Override
   public void addInterceptors(final InterceptorRegistry registry) {
-    final var interceptorRegistration = registry.addInterceptor(logInterceptor);
+    final var interceptorRegistration = registry.addInterceptor(interceptor);
     interceptorRegistration.order(Ordered.HIGHEST_PRECEDENCE);
   }
 }
