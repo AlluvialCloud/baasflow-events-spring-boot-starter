@@ -271,6 +271,7 @@
                 <configuration>
                     <quiet>true</quiet>
                     <failOnError>false</failOnError>
+                    <additionalOptions>-Xdoclint:none</additionalOptions>
                 </configuration>
             </plugin>
         </plugins>
