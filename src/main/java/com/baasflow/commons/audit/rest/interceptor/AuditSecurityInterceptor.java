@@ -52,6 +52,7 @@ import java.util.*;
  * An interceptor that handles auditing and security events for REST calls.
  * <p>
  * Lifecycle
+ * <ul>
  * <li>{@link #preHandle} populate http request headers</li>
  * <li>{@link #handleAnnotatedMethodCall} AOP around the method, populate info from about method and method params and result, also can
  * process some cases the {@link ProblemDetail}</li>
@@ -59,6 +60,7 @@ import java.util.*;
  * <li>{@link #beforeBodyWrite} some cases will handle the {@link ProblemDetail}</li>
  * <li>{@link #preHandle} if somehow it's not called yet, then will be processed the http request headers</li>
  * <li>{@link #afterCompletion} some cases will handle the {@link ProblemDetail}, and the event will be published</li>
+ * </ul>
  */
 @RequiredArgsConstructor
 @Component
