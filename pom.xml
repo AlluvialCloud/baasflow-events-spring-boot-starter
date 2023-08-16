@@ -36,6 +36,36 @@
     <description>BaaSFlow commons events implementation</description>
     <url>https://github.com/AlluvialCloud/baasflow-events-spring-boot-starter</url>
 
+    <licenses>
+        <license>
+            <name>Apache License, Version 2</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+            <comments>An OSI approved open source license.</comments>
+        </license>
+    </licenses>
+
+    <scm>
+        <connection>git@github.com:AlluvialCloud/baasflow-events-spring-boot-starter.git</connection>
+        <developerConnection>git@github.com:AlluvialCloud/baasflow-events-spring-boot-starter.git</developerConnection>
+        <url>https://github.com/AlluvialCloud/baasflow-events-spring-boot-starter</url>
+    </scm>
+
+    <developers>
+        <developer>
+            <name>Kristof Jozsa</name>
+            <email>kristof.jozsa@baasflow.com</email>
+            <organization>BaaSFlow</organization>
+            <organizationUrl>http://www.baasflow.com</organizationUrl>
+        </developer>
+        <developer>
+            <name>Tamas Sipos</name>
+            <email>tamas.sipos@baasflow.com</email>
+            <organization>BaaSFlow</organization>
+            <organizationUrl>http://www.baasflow.com</organizationUrl>
+        </developer>
+    </developers>
+
     <properties>
         <java.version>17</java.version>
         <lombok.version>1.18.28</lombok.version>
@@ -45,15 +75,6 @@
         <jakarta.servlet-api.version>6.0.0</jakarta.servlet-api.version>
         <swagger-annotations-jakarta.version>2.2.15</swagger-annotations-jakarta.version>
     </properties>
-
-    <licenses>
-        <license>
-            <name>Apache License, Version 2</name>
-            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-            <comments>An OSI approved open source license.</comments>
-        </license>
-    </licenses>
 
     <dependencies>
         <dependency>
@@ -260,18 +281,4 @@
             <url>https://packages.confluent.io/maven/</url>
         </repository>
     </repositories>
-    <developers>
-        <developer>
-            <name>Kristof Jozsa</name>
-            <email>kristof.jozsa@baasflow.com</email>
-            <organization>BaaSFlow</organization>
-            <organizationUrl>http://www.baasflow.com</organizationUrl>
-        </developer>
-        <developer>
-            <name>Tamas Sipos</name>
-            <email>tamas.sipos@baasflow.com</email>
-            <organization>BaaSFlow</organization>
-            <organizationUrl>http://www.baasflow.com</organizationUrl>
-        </developer>
-    </developers>
 </project>
