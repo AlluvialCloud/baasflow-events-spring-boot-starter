@@ -34,6 +34,7 @@
     <version>1.0.0-SNAPSHOT</version>
     <name>baasflow-commons-events-spring-boot-starter</name>
     <description>BaaSFlow commons events implementation</description>
+    <url>https://github.com/AlluvialCloud/baasflow-events-spring-boot-starter</url>
 
     <properties>
         <java.version>17</java.version>
@@ -221,6 +222,36 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <quiet>true</quiet>
+                    <failOnError>false</failOnError>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <repositories>
@@ -229,4 +260,18 @@
             <url>https://packages.confluent.io/maven/</url>
         </repository>
     </repositories>
+    <developers>
+        <developer>
+            <name>Kristof Jozsa</name>
+            <email>kristof.jozsa@baasflow.com</email>
+            <organization>BaaSFlow</organization>
+            <organizationUrl>http://www.baasflow.com</organizationUrl>
+        </developer>
+        <developer>
+            <name>Tamas Sipos</name>
+            <email>tamas.sipos@baasflow.com</email>
+            <organization>BaaSFlow</organization>
+            <organizationUrl>http://www.baasflow.com</organizationUrl>
+        </developer>
+    </developers>
 </project>
