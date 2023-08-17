@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * This class represents the EventService, which is a service responsible for sending event messages.
@@ -110,6 +111,28 @@ public class EventService {
         Event eventMessage = builder.event(sourceModule, event, eventType, eventStatus, payload, payloadType, correlationIds);
         send(eventMessage);
     }
+
+    /**
+     * Performs an audited event by executing the provided function with the given event builder.
+     *
+     * @param eventBuilder the event builder function that configures the event message
+     * @param function     the function to be executed as part of the audited event
+     * @param <T>          the type of the result returned by the function
+     * @return the result of the function execution
+     * @throws Exception if an exception occurs during the execution of the function
+     */
+    public <T> T auditedEvent(Function<Event.Builder, Event.Builder> eventBuilder, Supplier<T> function) {
+        Event eventMessage = eventBuilder.apply(EventBuilder.createEventBuilder()).build();
+        try {
+            T result = function.get();
+            eventMessage.setEventStatus(EventStatus.success);
+            return result;
+        } catch (Exception e) {
+            eventMessage.setEventStatus(EventStatus.failure);
+            throw e;
+        }
+    }
+
 
     private void send(Event eventMessage) {
         try {
