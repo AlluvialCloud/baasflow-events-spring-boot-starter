@@ -235,7 +235,6 @@
                 <configuration>
                     <excludes>
                         <exclude>README.md</exclude>
-                        <exclude>src/main/avro/**</exclude>
                         <exclude>src/test/java/**</exclude>
                         <exclude>lombok.config</exclude>
                         <exclude>**/*.yml</exclude>
