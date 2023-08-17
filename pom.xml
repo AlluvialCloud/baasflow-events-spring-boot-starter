@@ -241,6 +241,20 @@
                         <exclude>**/*.yml</exclude>
                         <exclude>**/*imports</exclude>
                     </excludes>
+                    <licenseFamilies>
+                        <licenseFamily implementation="org.apache.rat.license.SimpleLicenseFamily">
+                            <familyName>BaaSFlow</familyName>
+                        </licenseFamily>
+                    </licenseFamilies>
+                    <licenses>
+                        <license implementation="org.apache.rat.analysis.license.SimplePatternBasedLicense">
+                            <licenseFamilyCategory>BaaSFlow</licenseFamilyCategory>
+                            <notes><![CDATA[Apache License, Version 2.0]]></notes>
+                            <patterns>
+                                <pattern>Apache License, Version 2.0</pattern>
+                            </patterns>
+                        </license>
+                    </licenses>
                 </configuration>
             </plugin>
             <plugin>
