@@ -113,26 +113,30 @@ public class EventService {
     }
 
     /**
-     * Performs an audited event by executing the provided function with the given event builder.
+     * Executes a function with an audited event message using the provided event builder.
      *
-     * @param eventBuilder the event builder function that configures the event message
-     * @param function     the function to be executed as part of the audited event
-     * @param <T>          the type of the result returned by the function
-     * @return the result of the function execution
-     * @throws Exception if an exception occurs during the execution of the function
+     * @param eventBuilder the function that applies modifications to the event builder
+     * @param function     the function to be executed with the modified event builder
+     * @param <T>          the type of the result of the function
+     * @return the result of the executed function
+     * @throws Exception if an exception occurs while executing the function
      */
-    public <T> T auditedEvent(Function<Event.Builder, Event.Builder> eventBuilder, Supplier<T> function) {
-        Event eventMessage = eventBuilder.apply(EventBuilder.createEventBuilder()).build();
+    public <T> T auditedEvent(Function<Event.Builder, Event.Builder> eventBuilder, Function<Event.Builder,T> function) {
+        Event.Builder builder = eventBuilder.apply(EventBuilder.createEventBuilder());
         try {
-            T result = function.get();
-            eventMessage.setEventStatus(EventStatus.success);
+            T result = function.apply(builder);
+            builder.setEventStatus(EventStatus.success);
             return result;
+
         } catch (Exception e) {
-            eventMessage.setEventStatus(EventStatus.failure);
+            builder.setEventStatus(EventStatus.failure);
             throw e;
+
+        } finally {
+            Event eventMessage = builder.build();
+            send(eventMessage);
         }
     }
-
 
     private void send(Event eventMessage) {
         try {
