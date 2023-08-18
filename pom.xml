@@ -12,7 +12,7 @@
 
     <groupId>com.baasflow.events</groupId>
     <artifactId>baasflow-events-spring-boot-starter</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
     <name>baasflow-commons-events-spring-boot-starter</name>
     <description>BaaSFlow commons events implementation</description>
     <url>https://github.com/AlluvialCloud/baasflow-events-spring-boot-starter</url>
@@ -55,6 +55,7 @@
         <jsr305.version>3.0.2</jsr305.version>
         <jakarta.servlet-api.version>6.0.0</jakarta.servlet-api.version>
         <swagger-annotations-jakarta.version>2.2.15</swagger-annotations-jakarta.version>
+        <snakeyaml.version>2.1</snakeyaml.version>
     </properties>
 
     <dependencies>

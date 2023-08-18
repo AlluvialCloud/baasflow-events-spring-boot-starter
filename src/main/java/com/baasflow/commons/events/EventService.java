@@ -30,7 +30,6 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * This class represents the EventService, which is a service responsible for sending event messages.
