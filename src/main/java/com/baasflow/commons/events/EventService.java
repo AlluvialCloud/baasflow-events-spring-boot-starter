@@ -125,7 +125,9 @@ public class EventService {
         Event.Builder builder = eventBuilder.apply(EventBuilder.createEventBuilder());
         try {
             T result = function.apply(builder);
-            builder.setEventStatus(EventStatus.success);
+            if (builder.getEventStatus() != null) {
+                builder.setEventStatus(EventStatus.success);
+            }
             return result;
 
         } catch (Exception e) {
