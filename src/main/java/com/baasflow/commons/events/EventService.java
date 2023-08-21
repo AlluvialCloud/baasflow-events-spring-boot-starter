@@ -6,7 +6,7 @@
  * to you under the Apache License, Version 2.0 (the
  * "License"); you may not use this  file except in compliance
  * with the License. You may obtain a copy of the License at
- * 
+ *
  * http://www.baasFlow.com/licenses/Apache_LICENSE-2.0
  * or the root of this project.
  *
@@ -120,11 +120,13 @@ public class EventService {
      * @return the result of the executed function
      * @throws Exception if an exception occurs while executing the function
      */
-    public <T> T auditedEvent(Function<Event.Builder, Event.Builder> eventBuilder, Function<Event.Builder,T> function) {
-        Event.Builder builder = eventBuilder.apply(EventBuilder.createEventBuilder());
+    public <T> T auditedEvent(Function<Event.Builder, Event.Builder> eventBuilder, Function<Event.Builder, T> function) {
+        Event.Builder builder = eventBuilder.apply(
+                EventBuilder.createEventBuilder()
+                        .setEventType(EventType.audit));
         try {
             T result = function.apply(builder);
-            if (builder.getEventStatus() != null) {
+            if (builder.getEventStatus() == null) {
                 builder.setEventStatus(EventStatus.success);
             }
             return result;
@@ -134,8 +136,7 @@ public class EventService {
             throw e;
 
         } finally {
-            Event eventMessage = builder.build();
-            send(eventMessage);
+            send(builder.build());
         }
     }
 
