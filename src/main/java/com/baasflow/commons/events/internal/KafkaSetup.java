@@ -32,6 +32,7 @@ import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
+import java.util.Map;
 
 @Component
 public class KafkaSetup {
@@ -50,11 +51,16 @@ public class KafkaSetup {
     @PostConstruct
     public void kafkaTemplates() {
         logger.info("setting up kafka producers");
-        for (String key : kafkaConfigProperties.getEvents().keySet()) {
-            var properties = kafkaConfigProperties.getEvents().get(key).getKafka();
-            logger.info("setting up kafka producer for '{}' events using brokers: {}", key, properties.getBrokers());
-            var producerFactory = createProducerFactory(properties.getBrokers());
-            properties.setKafkaTemplate(new KafkaTemplate<>(producerFactory));
+        Map<String, KafkaConfigProperties.Event> events = kafkaConfigProperties.getEvents();
+        if (events != null) {
+            for (String key : events.keySet()) {
+                var properties = events.get(key).getKafka();
+                logger.info("setting up kafka producer for '{}' events using brokers: {}", key, properties.getBrokers());
+                var producerFactory = createProducerFactory(properties.getBrokers());
+                properties.setKafkaTemplate(new KafkaTemplate<>(producerFactory));
+            }
+        } else {
+            logger.warn("no Events set up in application.yml");
         }
     }
 
