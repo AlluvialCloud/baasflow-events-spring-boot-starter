@@ -12,7 +12,7 @@
 
     <groupId>com.baasflow.events</groupId>
     <artifactId>baasflow-events-spring-boot-starter</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.4-SNAPSHOT</version>
     <name>baasflow-commons-events-spring-boot-starter</name>
     <description>BaaSFlow commons events implementation</description>
     <url>https://github.com/AlluvialCloud/baasflow-events-spring-boot-starter</url>
