@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 
@@ -42,10 +43,13 @@ public class KafkaSender {
     @Autowired
     KafkaConfigProperties kafkaConfigProperties;
 
+    @Autowired
+    KafkaTemplate<String, byte[]> kafkaTemplate;
 
     @PostConstruct
     public void init() {
         logger.info("Events is set up using the following configuration: {}", kafkaConfigProperties);
+        kafkaTemplate.executeInTransaction(callback -> callback);
     }
 
     public CompletableFuture<SendResult<String, byte[]>> send(Event event) throws IOException {
