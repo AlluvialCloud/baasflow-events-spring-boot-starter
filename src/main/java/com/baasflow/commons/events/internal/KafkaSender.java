@@ -49,7 +49,7 @@ public class KafkaSender {
     @PostConstruct
     public void init() {
         logger.info("Events is set up using the following configuration: {}", kafkaConfigProperties);
-        kafkaTemplate.executeInTransaction(callback -> callback);
+        kafkaTemplate.metrics();
     }
 
     public CompletableFuture<SendResult<String, byte[]>> send(Event event) throws IOException {
