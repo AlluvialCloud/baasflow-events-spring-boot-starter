@@ -19,7 +19,7 @@ class TestEventService {
         eventService.kafkaSender = mock(KafkaSender.class);
 
         ArgumentCaptor<Event> valueCapture = ArgumentCaptor.forClass(Event.class);
-        doNothing().when(eventService.kafkaSender).send(valueCapture.capture());
+        doReturn(null).when(eventService.kafkaSender).send(valueCapture.capture());
 
         eventService.sendEvent(event ->
                 event.setPayload("payload")
