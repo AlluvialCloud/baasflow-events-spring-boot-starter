@@ -46,6 +46,15 @@ public class KafkaConfigProperties {
             private String brokers;
             private String topic;
             private transient KafkaTemplate<String, byte[]> kafkaTemplate;
+
+            private Producer producer;
+
+            @Data
+            @NoArgsConstructor
+            public static class Producer {
+                private String keySerializer;
+                private String valueSerializer;
+            }
         }
     }
 }

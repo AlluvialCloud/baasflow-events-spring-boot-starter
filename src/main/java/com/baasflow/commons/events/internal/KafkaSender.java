@@ -26,14 +26,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -48,9 +46,11 @@ public class KafkaSender {
     @PostConstruct
     public void init() {
         logger.info("Events is set up using the following configuration: {}", kafkaConfigProperties);
-        Optional<String> first = kafkaConfigProperties.getEvents().keySet().stream().findAny();
-        first.map(key -> kafkaConfigProperties.getEvents().get(key).getKafka().getKafkaTemplate())
-                .ifPresent(KafkaTemplate::metrics);
+        kafkaConfigProperties.getEvents().forEach((key, value) -> {
+            logger.info("triggering Kafka producer initialization for {}", value.getKafka().getBrokers());
+            KafkaConfigProperties.Event.Kafka kafka = value.getKafka();
+            kafka.getKafkaTemplate().metrics();
+        });
     }
 
     public CompletableFuture<SendResult<String, byte[]>> send(Event event) throws IOException {

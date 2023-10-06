@@ -1,14 +1,16 @@
 baasflow:
-    commons.events:
-        kafka:
-            producer:
-                key-serializer: org.apache.kafka.common.serialization.StringSerializer
-                value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
-        audit:
+    commons:
+        events:
+            enabled: "true"
             kafka:
-                brokers: <override from environment specific configuration>
-                topic: <override from environment specific configuration>
-        generic:
-            kafka:
-                brokers: <override from environment specific configuration>
-                topic: <override from environment specific configuration>
+                producer:
+                    key-serializer: org.apache.kafka.common.serialization.StringSerializer
+                    value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+            audit:
+                kafka:
+                    brokers: <override from environment specific configuration>
+                    topic: <override from environment specific configuration>
+            generic:
+                kafka:
+                    brokers: <override from environment specific configuration>
+                    topic: <override from environment specific configuration>

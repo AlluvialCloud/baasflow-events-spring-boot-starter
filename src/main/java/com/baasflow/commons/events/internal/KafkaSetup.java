@@ -38,10 +38,10 @@ import java.util.Map;
 public class KafkaSetup {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Value("${baasflow.events.kafka.producer.key-serializer:org.apache.kafka.common.serialization.StringSerializer}")
+    @Value("${baasflow.commons.events.kafka.producer.key-serializer}")
     String keySerializer;
 
-    @Value("${baasflow.events.kafka.producer.value-serializer:org.apache.kafka.common.serialization.ByteArraySerializer}")
+    @Value("${baasflow.commons.events.kafka.producer.value-serializer}")
     String valueSerializer;
 
     @Autowired
@@ -55,8 +55,9 @@ public class KafkaSetup {
         if (events != null) {
             for (String key : events.keySet()) {
                 var properties = events.get(key).getKafka();
-                logger.info("setting up kafka producer for '{}' events using brokers: {}", key, properties.getBrokers());
-                var producerFactory = createProducerFactory(properties.getBrokers());
+                KafkaConfigProperties.Event.Kafka.Producer producer = properties.getProducer();
+                logger.info("setting up kafka producer for '{}' events using brokers: {} and key/value serializer: {} / {}", key, properties.getBrokers(), producer.getKeySerializer(), producer.getValueSerializer());
+                var producerFactory = createProducerFactory(properties.getBrokers(), producer);
                 properties.setKafkaTemplate(new KafkaTemplate<>(producerFactory));
             }
         } else {
@@ -64,11 +65,11 @@ public class KafkaSetup {
         }
     }
 
-    private ProducerFactory<String, byte[]> createProducerFactory(String brokers) {
+    private ProducerFactory<String, byte[]> createProducerFactory(String brokers, KafkaConfigProperties.Event.Kafka.Producer producer) {
         var configProps = new HashMap<String, Object>();
         configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers);
-        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer);
-        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer);
+        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, producer.getKeySerializer());
+        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, producer.getValueSerializer());
         return new DefaultKafkaProducerFactory<>(configProps);
     }
 }
