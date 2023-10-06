@@ -33,6 +33,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -43,13 +44,13 @@ public class KafkaSender {
     @Autowired
     KafkaConfigProperties kafkaConfigProperties;
 
-    @Autowired
-    KafkaTemplate<String, byte[]> kafkaTemplate;
 
     @PostConstruct
     public void init() {
         logger.info("Events is set up using the following configuration: {}", kafkaConfigProperties);
-        kafkaTemplate.metrics();
+        Optional<String> first = kafkaConfigProperties.getEvents().keySet().stream().findAny();
+        first.map(key -> kafkaConfigProperties.getEvents().get(key).getKafka().getKafkaTemplate())
+                .ifPresent(KafkaTemplate::metrics);
     }
 
     public CompletableFuture<SendResult<String, byte[]>> send(Event event) throws IOException {
