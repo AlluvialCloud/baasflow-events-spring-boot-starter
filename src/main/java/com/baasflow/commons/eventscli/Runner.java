@@ -82,6 +82,7 @@ public class Runner implements CommandLineRunner {
     }
 
     public static void main(String[] args) {
+        System.setProperty("spring.main.web-application-type", "none");
         SpringApplication application = new SpringApplication(Runner.class);
         application.setBannerMode(Banner.Mode.OFF);
         application.setLogStartupInfo(false);

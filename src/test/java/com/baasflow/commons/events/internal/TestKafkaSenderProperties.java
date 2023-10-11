@@ -8,7 +8,7 @@ import java.io.IOException;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class TestKafkaSender {
+class TestKafkaSenderProperties {
 
     private KafkaSender kafkaSender = new KafkaSender();
 

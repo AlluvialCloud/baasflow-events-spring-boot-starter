@@ -1,16 +1,17 @@
 baasflow:
-    commons:
-        events:
-            enabled: "true"
-            kafka:
-                producer:
-                    key-serializer: org.apache.kafka.common.serialization.StringSerializer
-                    value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+    events:
+        disabled: "false"
+        kafka:
+            msk: "true"
+            brokers: "<override from environment specific configuration>"
+            key-serializer: "org.apache.kafka.common.serialization.StringSerializer"
+            value-serializer: "org.apache.kafka.common.serialization.ByteArraySerializer"
+            connection-timeout-ms: 1000
+            request-timeout-ms: 1000
+            retries-count: 3
+            retry-backoff-ms: 100
+        channels:
             audit:
-                kafka:
-                    brokers: <override from environment specific configuration>
-                    topic: <override from environment specific configuration>
+                topic: "auditlog"
             generic:
-                kafka:
-                    brokers: <override from environment specific configuration>
-                    topic: <override from environment specific configuration>
+                topic: "genericlog"

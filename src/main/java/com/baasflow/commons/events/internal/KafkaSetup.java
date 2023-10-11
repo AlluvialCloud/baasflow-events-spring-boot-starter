@@ -25,7 +25,6 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
@@ -33,43 +32,58 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
 
 @Component
 public class KafkaSetup {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @Value("${baasflow.commons.events.kafka.producer.key-serializer}")
-    String keySerializer;
-
-    @Value("${baasflow.commons.events.kafka.producer.value-serializer}")
-    String valueSerializer;
-
     @Autowired
-    KafkaConfigProperties kafkaConfigProperties;
-
+    EventsConfigProperties eventsConfigProperties;
 
     @PostConstruct
     public void kafkaTemplates() {
-        logger.info("setting up kafka producers");
-        Map<String, KafkaConfigProperties.Event> events = kafkaConfigProperties.getEvents();
-        if (events != null) {
-            for (String key : events.keySet()) {
-                var properties = events.get(key).getKafka();
-                KafkaConfigProperties.Event.Kafka.Producer producer = properties.getProducer();
-                logger.info("setting up kafka producer for '{}' events using brokers: {} and key/value serializer: {} / {}", key, properties.getBrokers(), producer.getKeySerializer(), producer.getValueSerializer());
-                var producerFactory = createProducerFactory(properties.getBrokers(), producer);
-                properties.setKafkaTemplate(new KafkaTemplate<>(producerFactory));
+        Map<String, EventsConfigProperties.Event> channels = eventsConfigProperties.getChannels();
+        if (channels != null) {
+            EventsConfigProperties.KafkaProperties globalKafkaProperties = eventsConfigProperties.getKafka();
+            for (String channel : channels.keySet()) {
+                var localKafkaProperties = channels.get(channel).getKafka();
+                var producerFactory = createProducerFactory(channel, globalKafkaProperties, localKafkaProperties);
+                localKafkaProperties.setKafkaTemplate(new KafkaTemplate<>(producerFactory));
             }
         } else {
             logger.warn("no Events set up in application.yml");
         }
     }
 
-    private ProducerFactory<String, byte[]> createProducerFactory(String brokers, KafkaConfigProperties.Event.Kafka.Producer producer) {
-        var configProps = new HashMap<String, Object>();
-        configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers);
-        configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, producer.getKeySerializer());
-        configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, producer.getValueSerializer());
-        return new DefaultKafkaProducerFactory<>(configProps);
+    private ProducerFactory<String, byte[]> createProducerFactory(String channel, EventsConfigProperties.KafkaProperties global, EventsConfigProperties.KafkaProperties local) {
+        var brokers = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getBrokers);
+        var keySerializer = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getKeySerializer);
+        var valueSerializer = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getValueSerializer);
+        var connectionTimeoutMs = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getConnectionTimeoutMs);
+        var requestTimeoutMs = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getRequestTimeoutMs);
+        var deliveryTimeoutMs = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getDeliveryTimeoutMs);
+        var retryBackoffMs = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getRetryBackoffMs);
+        var maxBlockMs = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getMaxBlockMs);
+        var retriesCount = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getRetriesCount);
+
+        var properties = new HashMap<String, Object>();
+        properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers);
+        properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer);
+        properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer);
+        properties.put(ProducerConfig.SOCKET_CONNECTION_SETUP_TIMEOUT_MS_CONFIG, connectionTimeoutMs);
+        properties.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, requestTimeoutMs);
+        properties.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, deliveryTimeoutMs);
+        properties.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, retryBackoffMs);
+        properties.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, maxBlockMs);
+        properties.put(ProducerConfig.RETRIES_CONFIG, retriesCount);
+
+        logger.info("kafka producer config for channel {}: {}", channel, properties);
+        return new DefaultKafkaProducerFactory<>(properties);
+    }
+
+    static <T, S> T getLocalOrFallback(S global, S local, Function<S, T> f) {
+        return Optional.ofNullable(local).map(f).orElseGet(() -> f.apply(global));
     }
 }

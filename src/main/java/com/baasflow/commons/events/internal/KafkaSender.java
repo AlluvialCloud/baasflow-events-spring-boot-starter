@@ -40,30 +40,42 @@ public class KafkaSender {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    KafkaConfigProperties kafkaConfigProperties;
+    EventsConfigProperties eventsConfigProperties;
 
 
     @PostConstruct
     public void init() {
-        logger.info("Events is set up using the following configuration: {}", kafkaConfigProperties);
-        kafkaConfigProperties.getEvents().forEach((key, value) -> {
-            logger.info("triggering Kafka producer initialization for {}", value.getKafka().getBrokers());
-            KafkaConfigProperties.Event.Kafka kafka = value.getKafka();
+        if (eventsConfigProperties.isDisabled()) {
+            logger.warn("Baasflow Events module is disabled in configuration");
+            return;
+        }
+
+        eventsConfigProperties.getChannels().forEach((key, value) -> {
+            logger.info("triggering Kafka producer initialization for channel '{}' using brokers: {}", key, value.getKafka().getBrokers());
+            EventsConfigProperties.KafkaProperties kafka = value.getKafka();
             kafka.getKafkaTemplate().metrics();
         });
     }
 
     public CompletableFuture<SendResult<String, byte[]>> send(Event event) throws IOException {
+        if (eventsConfigProperties.isDisabled()) {
+            logger.warn("skip sending event to Kafka, Baasflow Events module is disabled in configuration");
+            return null;
+        }
+
         String eventId = event.getId().toString();
         byte[] serialized = serialize(event);
 
-        var properties = kafkaConfigProperties.getEvents().get(event.getEventType().name()).getKafka();
-        var kafkaTemplate = properties.getKafkaTemplate();
+        var properties = eventsConfigProperties.getChannels().get(event.getEventType().name());
+        var kafkaTemplate = properties.getKafka().getKafkaTemplate();
         var topic = properties.getTopic();
 
         logger.info("sending {} event {} to topic {}: {}", event.getEventType().name(), eventId, topic, event);
         CompletableFuture<SendResult<String, byte[]>> future = kafkaTemplate.send(topic, eventId, serialized);
 
+        if (logger.isTraceEnabled()) {
+            future.thenRun(() -> logger.trace("%% EVENT SENT to topic: {}: {}", topic, eventId));
+        }
         future.exceptionally(e -> {
             var message = new String(Base64.getEncoder().encode(serialized), StandardCharsets.UTF_8);
             logger.error("%% EVENT SENDING FAILED to topic: {}: {}", topic, message, e);

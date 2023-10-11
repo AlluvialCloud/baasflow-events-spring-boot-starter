@@ -1,10 +1,17 @@
 baasflow:
     events:
-        audit:
-            kafka:
-                brokers: "localhost:9092"
-                topic: auditlog
-        generic:
-            kafka:
-                brokers: "localhost:9092"
-                topic: events
+        disabled: "false"
+        # generic kafka configuration
+        kafka:
+            msk: "true"
+            brokers: "localhost:9092"
+            key-serializer: "org.apache.kafka.common.serialization.StringSerializer"
+            value-serializer: "org.apache.kafka.common.serialization.ByteArraySerializer"
+        channels:
+            audit:
+                topic: "auditlog"
+                kafka:
+                    brokers: "localhost:9092"
+                    msk: "true"
+            generic:
+                topic: "events"
