@@ -21,7 +21,9 @@
 package com.baasflow.commons.events.internal;
 
 import jakarta.annotation.PostConstruct;
+import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.common.config.SaslConfigs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,6 +69,7 @@ public class KafkaSetup {
         var retryBackoffMs = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getRetryBackoffMs);
         var maxBlockMs = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getMaxBlockMs);
         var retriesCount = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getRetriesCount);
+        var msk = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getMsk);
 
         var properties = new HashMap<String, Object>();
         properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers);
@@ -78,6 +81,13 @@ public class KafkaSetup {
         properties.put(ProducerConfig.RETRY_BACKOFF_MS_CONFIG, retryBackoffMs);
         properties.put(ProducerConfig.MAX_BLOCK_MS_CONFIG, maxBlockMs);
         properties.put(ProducerConfig.RETRIES_CONFIG, retriesCount);
+
+        if (msk) {
+            properties.put(CommonClientConfigs.SECURITY_PROTOCOL_CONFIG, "SASL_SSL");
+            properties.put(SaslConfigs.SASL_MECHANISM, "AWS_MSK_IAM");
+            properties.put(SaslConfigs.SASL_JAAS_CONFIG, "software.amazon.msk.auth.iam.IAMLoginModule required;");
+            properties.put(SaslConfigs.SASL_CLIENT_CALLBACK_HANDLER_CLASS, "software.amazon.msk.auth.iam.IAMClientCallbackHandler");
+        }
 
         logger.info("kafka producer config for channel {}: {}", channel, properties);
         return new DefaultKafkaProducerFactory<>(properties);

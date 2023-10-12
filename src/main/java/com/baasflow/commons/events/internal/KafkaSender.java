@@ -51,9 +51,8 @@ public class KafkaSender {
         }
 
         eventsConfigProperties.getChannels().forEach((key, value) -> {
-            logger.info("triggering Kafka producer initialization for channel '{}' using brokers: {}", key, value.getKafka().getBrokers());
-            EventsConfigProperties.KafkaProperties kafka = value.getKafka();
-            kafka.getKafkaTemplate().metrics();
+            logger.info("triggering Kafka producer initialization for channel '{}'", key);
+            value.getKafka().getKafkaTemplate().metrics();
         });
     }
 

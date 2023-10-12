@@ -65,7 +65,7 @@ public class EventsConfigProperties {
     @AllArgsConstructor
     @Builder
     public static class KafkaProperties {
-        private boolean msk;
+        private Boolean msk;
         private String brokers;
         private String keySerializer;
         private String valueSerializer;
