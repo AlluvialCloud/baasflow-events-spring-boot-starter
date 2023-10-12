@@ -46,6 +46,7 @@ public class EventsConfigProperties {
             .retryBackoffMs(100)
             .maxBlockMs(60_000)
             .retriesCount(1)
+            .msk(false)
             .build();
 
     private Map<String, Event> channels;
