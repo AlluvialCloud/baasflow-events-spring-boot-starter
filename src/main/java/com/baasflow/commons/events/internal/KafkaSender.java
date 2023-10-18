@@ -66,6 +66,9 @@ public class KafkaSender {
         byte[] serialized = serialize(event);
 
         var properties = eventsConfigProperties.getChannels().get(event.getEventType().name());
+        if (properties == null) {
+            throw new RuntimeException("Failed to find Events Channel configuration for event type: " + event.getEventType().name());
+        }
         var kafkaTemplate = properties.getKafka().getKafkaTemplate();
         var topic = properties.getTopic();
 
