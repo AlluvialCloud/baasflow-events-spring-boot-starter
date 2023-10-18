@@ -44,8 +44,14 @@ public class KafkaSetup {
     @Autowired
     EventsConfigProperties eventsConfigProperties;
 
+
     @PostConstruct
     public void kafkaTemplates() {
+        if (eventsConfigProperties.isDisabled()) {
+            logger.warn("Baasflow Events library is disabled in the configuration");
+            return;
+        }
+
         Map<String, EventsConfigProperties.Event> channels = eventsConfigProperties.getChannels();
         if (channels != null) {
             EventsConfigProperties.KafkaProperties globalKafkaProperties = eventsConfigProperties.getKafka();
