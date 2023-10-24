@@ -47,6 +47,7 @@ public class EventsConfigProperties {
             .maxBlockMs(60_000)
             .retriesCount(1)
             .msk(false)
+            .awsRegion("eu-central-1")
             .build();
 
     private Map<String, Event> channels;
@@ -67,6 +68,7 @@ public class EventsConfigProperties {
     @Builder
     public static class KafkaProperties {
         private Boolean msk;
+        private String awsRegion;
         private String brokers;
         private String keySerializer;
         private String valueSerializer;

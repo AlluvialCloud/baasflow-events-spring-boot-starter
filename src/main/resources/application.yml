@@ -5,11 +5,12 @@ baasflow:
             msk: "true"
             brokers: "<override from environment specific configuration>"
             key-serializer: "org.apache.kafka.common.serialization.StringSerializer"
-            value-serializer: "org.apache.kafka.common.serialization.ByteArraySerializer"
+            value-serializer: "com.amazonaws.services.schemaregistry.serializers.GlueSchemaRegistryKafkaSerializer"
             connection-timeout-ms: 1000
             request-timeout-ms: 1000
             retries-count: 3
             retry-backoff-ms: 100
+            aws-region: "eu-central-1"
         channels:
             audit:
                 topic: "auditlog"

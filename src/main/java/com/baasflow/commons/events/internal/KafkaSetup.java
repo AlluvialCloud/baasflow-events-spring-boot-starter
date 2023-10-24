@@ -20,6 +20,7 @@
 
 package com.baasflow.commons.events.internal;
 
+import com.amazonaws.services.schemaregistry.utils.AWSSchemaRegistryConstants;
 import jakarta.annotation.PostConstruct;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -76,6 +77,7 @@ public class KafkaSetup {
         var maxBlockMs = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getMaxBlockMs);
         var retriesCount = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getRetriesCount);
         var msk = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getMsk);
+        var awsRegion = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getAwsRegion);
 
         var properties = new HashMap<String, Object>();
         properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers);
@@ -93,6 +95,10 @@ public class KafkaSetup {
             properties.put(SaslConfigs.SASL_MECHANISM, "AWS_MSK_IAM");
             properties.put(SaslConfigs.SASL_JAAS_CONFIG, "software.amazon.msk.auth.iam.IAMLoginModule required;");
             properties.put(SaslConfigs.SASL_CLIENT_CALLBACK_HANDLER_CLASS, "software.amazon.msk.auth.iam.IAMClientCallbackHandler");
+
+            properties.put(AWSSchemaRegistryConstants.AWS_REGION, awsRegion);
+            properties.put(AWSSchemaRegistryConstants.SCHEMA_AUTO_REGISTRATION_SETTING, "true");
+            properties.put(AWSSchemaRegistryConstants.DATA_FORMAT, "AVRO");
         }
 
         logger.info("kafka producer config for channel {}: {}", channel, properties);
