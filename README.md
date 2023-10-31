@@ -2,15 +2,16 @@
 Supply a standard spring configuration (properties or yaml) where you define Kafka brokers and topics for your scenarios. YAML example:
 ```
 baasflow:
-    commons.events:
-        audit:
-            kafka:
-                brokers: "localhost:9092"
-                topic: auditlog
-        generic:
-            kafka:
-                brokers: "localhost:9092"
-                topic: events
+    events:
+        kafka:
+            msk: false
+            brokers: "localhost:9092"
+            local-schema-registry-endpoint: "localhost:8081"
+        channels:
+            audit:
+                topic: "auditlog"
+            generic:
+                topic: "events"
 ```
 
 
@@ -20,7 +21,7 @@ Add the library as a dependency in pom.xml, eg.:
         <dependency>
             <groupId>com.baasflow.commons.events</groupId>
             <artifactId>baasflow-commons-events-spring-boot-starter</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <version>VERSION</version>
         </dependency>
 ```
 
