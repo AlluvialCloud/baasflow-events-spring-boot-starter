@@ -21,6 +21,7 @@
 package com.baasflow.commons.events.internal;
 
 import com.amazonaws.services.schemaregistry.utils.AWSSchemaRegistryConstants;
+import com.baasflow.commons.events.Event;
 import jakarta.annotation.PostConstruct;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -66,10 +67,8 @@ public class KafkaSetup {
         }
     }
 
-    private ProducerFactory<String, byte[]> createProducerFactory(String channel, EventsConfigProperties.KafkaProperties global, EventsConfigProperties.KafkaProperties local) {
+    private ProducerFactory<String, Event> createProducerFactory(String channel, EventsConfigProperties.KafkaProperties global, EventsConfigProperties.KafkaProperties local) {
         var brokers = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getBrokers);
-        var keySerializer = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getKeySerializer);
-        var valueSerializer = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getValueSerializer);
         var connectionTimeoutMs = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getConnectionTimeoutMs);
         var requestTimeoutMs = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getRequestTimeoutMs);
         var deliveryTimeoutMs = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getDeliveryTimeoutMs);
@@ -77,12 +76,15 @@ public class KafkaSetup {
         var maxBlockMs = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getMaxBlockMs);
         var retriesCount = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getRetriesCount);
         var msk = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getMsk);
-        var awsRegion = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getAwsRegion);
+        var awsRegion = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getGlueAwsRegion);
+        var registryName = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getGlueRegistryName);
+        var schemaName = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getGlueSchemaName);
+        var localSchemaRegistryEndpoint = getLocalOrFallback(global, local, EventsConfigProperties.KafkaProperties::getLocalSchemaRegistryEndpoint);
 
         var properties = new HashMap<String, Object>();
         properties.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers);
-        properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, keySerializer);
-        properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, valueSerializer);
+        properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer");
+        properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, msk ? "com.amazonaws.services.schemaregistry.serializers.GlueSchemaRegistryKafkaSerializer" : "io.confluent.kafka.serializers.KafkaAvroSerializer");
         properties.put(ProducerConfig.SOCKET_CONNECTION_SETUP_TIMEOUT_MS_CONFIG, connectionTimeoutMs);
         properties.put(ProducerConfig.REQUEST_TIMEOUT_MS_CONFIG, requestTimeoutMs);
         properties.put(ProducerConfig.DELIVERY_TIMEOUT_MS_CONFIG, deliveryTimeoutMs);
@@ -99,9 +101,13 @@ public class KafkaSetup {
             properties.put(AWSSchemaRegistryConstants.AWS_REGION, awsRegion);
             properties.put(AWSSchemaRegistryConstants.SCHEMA_AUTO_REGISTRATION_SETTING, "true");
             properties.put(AWSSchemaRegistryConstants.DATA_FORMAT, "AVRO");
+            properties.put(AWSSchemaRegistryConstants.REGISTRY_NAME, registryName);
+            properties.put(AWSSchemaRegistryConstants.SCHEMA_NAME, schemaName);
+        } else {
+            properties.put("schema.registry.url", localSchemaRegistryEndpoint);
         }
 
-        logger.info("kafka producer config for channel {}: {}", channel, properties);
+        logger.info("kafka producer config for channel {}: {}", channel, properties.toString().replaceAll(",", "\n"));
         return new DefaultKafkaProducerFactory<>(properties);
     }
 

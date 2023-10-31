@@ -38,8 +38,6 @@ public class EventsConfigProperties {
 
     @NestedConfigurationProperty
     private KafkaProperties kafka = KafkaProperties.builder()
-            .keySerializer("org.apache.kafka.common.serialization.StringSerializer")
-            .valueSerializer("org.apache.kafka.common.serialization.ByteArraySerializer")
             .connectionTimeoutMs(5_000)
             .requestTimeoutMs(5_000)
             .deliveryTimeoutMs(5_000)
@@ -47,7 +45,7 @@ public class EventsConfigProperties {
             .maxBlockMs(60_000)
             .retriesCount(1)
             .msk(false)
-            .awsRegion("eu-central-1")
+            .glueAwsRegion("eu-central-1")
             .build();
 
     private Map<String, Event> channels;
@@ -67,11 +65,15 @@ public class EventsConfigProperties {
     @AllArgsConstructor
     @Builder
     public static class KafkaProperties {
+        private String glueAwsRegion;
+        private String glueRegistryName;
+        private String glueSchemaName;
+        private String localSchemaRegistryEndpoint;
+
         private Boolean msk;
-        private String awsRegion;
         private String brokers;
-        private String keySerializer;
-        private String valueSerializer;
+//        private String keySerializer;
+//        private String valueSerializer;
 
         private Integer connectionTimeoutMs;
         private Integer requestTimeoutMs;
@@ -80,6 +82,6 @@ public class EventsConfigProperties {
         private Integer maxBlockMs;
         private Integer retriesCount;
 
-        private transient KafkaTemplate<String, byte[]> kafkaTemplate;
+        private transient KafkaTemplate<String, com.baasflow.commons.events.Event> kafkaTemplate;
     }
 }

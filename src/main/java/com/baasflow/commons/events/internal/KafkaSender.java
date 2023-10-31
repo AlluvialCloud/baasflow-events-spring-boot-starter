@@ -56,14 +56,13 @@ public class KafkaSender {
         });
     }
 
-    public CompletableFuture<SendResult<String, byte[]>> send(Event event) throws IOException {
+    public CompletableFuture<SendResult<String, Event>> send(Event event) throws IOException {
         if (eventsConfigProperties.isDisabled()) {
             logger.warn("skip sending event to Kafka, Baasflow Events module is disabled in configuration");
             return null;
         }
 
         String eventId = event.getId().toString();
-        byte[] serialized = serialize(event);
 
         var properties = eventsConfigProperties.getChannels().get(event.getEventType().name());
         if (properties == null) {
@@ -73,22 +72,26 @@ public class KafkaSender {
         var topic = properties.getTopic();
 
         logger.info("sending {} event {} to topic {}: {}", event.getEventType().name(), eventId, topic, event);
-        CompletableFuture<SendResult<String, byte[]>> future = kafkaTemplate.send(topic, eventId, serialized);
+        CompletableFuture<SendResult<String, Event>> future = kafkaTemplate.send(topic, eventId, event);
 
         if (logger.isTraceEnabled()) {
             future.thenRun(() -> logger.trace("%% EVENT SENT to topic: {}: {}", topic, eventId));
         }
         future.exceptionally(e -> {
-            var message = new String(Base64.getEncoder().encode(serialized), StandardCharsets.UTF_8);
+            var message = new String(Base64.getEncoder().encode(serialize(event)), StandardCharsets.UTF_8);
             logger.error("%% EVENT SENDING FAILED to topic: {}: {}", topic, message, e);
             return null;
         });
         return future;
     }
 
-    byte[] serialize(Event event) throws IOException {
-        byte[] message = event.toByteBuffer().array();
-        logger.trace("serialized event {} to {} bytes", event.getId(), message.length);
-        return message;
+    byte[] serialize(Event event) {
+        try {
+            byte[] message = event.toByteBuffer().array();
+            logger.trace("serialized event {} to {} bytes", event.getId(), message.length);
+            return message;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
