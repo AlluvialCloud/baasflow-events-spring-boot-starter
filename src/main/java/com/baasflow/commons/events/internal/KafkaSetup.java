@@ -25,6 +25,8 @@ import com.baasflow.commons.events.Event;
 import jakarta.annotation.PostConstruct;
 import org.apache.kafka.clients.CommonClientConfigs;
 import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.support.ProducerListener;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -45,6 +48,9 @@ public class KafkaSetup {
 
     @Autowired
     EventsConfigProperties eventsConfigProperties;
+
+    @Autowired
+    KafkaHealthIndicator kafkaHealthIndicator;
 
 
     @PostConstruct
@@ -60,11 +66,27 @@ public class KafkaSetup {
             for (String channel : channels.keySet()) {
                 var localKafkaProperties = channels.get(channel).getKafka();
                 var producerFactory = createProducerFactory(channel, globalKafkaProperties, localKafkaProperties);
-                localKafkaProperties.setKafkaTemplate(new KafkaTemplate<>(producerFactory));
+                localKafkaProperties.setKafkaTemplate(createKafkaTemplate(producerFactory));
             }
         } else {
             logger.warn("no Events set up in application.yml");
         }
+    }
+
+    private KafkaTemplate<String, Event> createKafkaTemplate(ProducerFactory<String, Event> producerFactory) {
+        KafkaTemplate<String, Event> kafkaTemplate = new KafkaTemplate<>(producerFactory);
+        kafkaTemplate.setProducerListener(new ProducerListener<>() {
+            @Override
+            public void onSuccess(ProducerRecord<String, Event> producerRecord, RecordMetadata recordMetadata) {
+                kafkaHealthIndicator.setHealthy();
+            }
+
+            @Override
+            public void onError(ProducerRecord<String, Event> producerRecord, RecordMetadata recordMetadata, Exception exception) {
+                kafkaHealthIndicator.setUnhealthy(exception);
+            }
+        });
+        return kafkaTemplate;
     }
 
     private ProducerFactory<String, Event> createProducerFactory(String channel, EventsConfigProperties.KafkaProperties global, EventsConfigProperties.KafkaProperties local) {
