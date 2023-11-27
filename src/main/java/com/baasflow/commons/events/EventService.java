@@ -28,6 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -121,9 +124,10 @@ public class EventService {
      * @throws Exception if an exception occurs while executing the function
      */
     public <T> T auditedEvent(Function<Event.Builder, Event.Builder> eventBuilder, Function<Event.Builder, T> function) {
-        Event.Builder builder = eventBuilder.apply(
-                EventBuilder.createEventBuilder()
+        Event.Builder builder = eventBuilder.apply(EventBuilder.createEventBuilder()
                         .setEventType(EventType.audit));
+
+        Event errorEvent = null;
         try {
             T result = function.apply(builder);
             if (builder.getEventStatus() == null) {
@@ -133,11 +137,42 @@ public class EventService {
 
         } catch (Exception e) {
             builder.setEventStatus(EventStatus.failure);
+
+            errorEvent = createErrorEvent(e, builder);
             throw e;
 
         } finally {
             send(builder.build());
+            if (errorEvent != null) {
+                send(errorEvent);
+            }
         }
+    }
+
+    private static Event createErrorEvent(Exception e, Event.Builder builder) {
+        Map<String, String> originalCorrelationIds = builder.getCorrelationIds();
+        Map<String, String> correlationIds = originalCorrelationIds != null ? new HashMap<>(originalCorrelationIds) : new HashMap<>();
+        correlationIds.put("originalEventId", builder.getId().toString());
+
+        return EventBuilder.createEventBuilder()
+                .setEventLogLevel(EventLogLevel.ERROR)
+                .setEventStatus(EventStatus.failure)
+
+                .setEventType(builder.getEventType())
+                .setSourceModule(builder.getSourceModule())
+                .setEvent(builder.getEvent())
+                .setTenantId(builder.getTenantId())
+                .setPayload(printStacktrace(e))
+                .setPayloadType("string")
+                .setCorrelationIds(correlationIds)
+                .build();
+    }
+
+    private static String printStacktrace(Throwable throwable) {
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        throwable.printStackTrace(pw);
+        return sw.toString();
     }
 
     private void send(Event eventMessage) {
