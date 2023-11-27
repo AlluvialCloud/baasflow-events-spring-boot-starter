@@ -4,14 +4,18 @@ import com.baasflow.commons.events.internal.KafkaSender;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 class TestEventService {
+    private static Logger logger = LoggerFactory.getLogger(TestEventService.class);
 
     @Test
     public void testSendWithBuilder() throws Exception {
@@ -50,7 +54,13 @@ class TestEventService {
         EventService eventService = mockEventService(EventStatus.failure);
 
         try {
-            eventService.auditedEvent(event -> event.setEventStatus(EventStatus.unknown), event -> {
+            eventService.auditedEvent(event -> event.setEventStatus(EventStatus.unknown)
+                            .setPayload("payload")
+                            .setCorrelationIds(Map.of("a", "b"))
+                            .setTenantId("tenantId")
+                            .setSourceModule("sourceModule")
+                            .setEvent("test event")
+                    , event -> {
                 assertEquals(EventStatus.unknown, event.getEventStatus());
                 System.out.println("processing");
                 throw new RuntimeException("test error while processing");
@@ -74,7 +84,7 @@ class TestEventService {
         EventService eventService = new EventService();
         eventService.kafkaSender = mock(KafkaSender.class);
         doAnswer(invocationOnMock -> {
-            System.out.println("sending to kafka: " + invocationOnMock.getArgument(0));
+            logger.info("sending to kafka: " + invocationOnMock.getArgument(0));
             Event event = invocationOnMock.getArgument(0, Event.class);
             assertNotNull(event.getEventType());
             assertNotNull(event.getEventStatus());
