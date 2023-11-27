@@ -27,7 +27,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.atomic.AtomicReference;
 
-@Component
+@Component("kafka")
 public class KafkaHealthIndicator implements HealthIndicator {
     private final AtomicReference<Health> healthStatus = new AtomicReference<>(Health.unknown().build());
 

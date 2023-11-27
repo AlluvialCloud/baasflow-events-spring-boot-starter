@@ -17,3 +17,11 @@ baasflow:
                 topic: "auditlog"
             generic:
                 topic: "genericlog"
+
+management:
+    endpoint:
+        health:
+            group:
+                kafka:
+                    include: "kafka"
+                    show-details: "always"
