@@ -9,7 +9,7 @@
 
 ## Configuration
 Supply a standard spring configuration (properties or yaml) where you define Kafka brokers and topics for your scenarios. YAML example:
-```
+```yaml
 baasflow:
     events:
         kafka:
@@ -39,3 +39,19 @@ then autowire com.baasflow.commons.events.EventService to your code and use its 
 ## CLI runner
 The CLI runner can send Baasflow Events right from the command line. Example:
 `SPRING_PROFILES_ACTIVE=test java -jar target/*-cli.jar -e event1 -t audit -m module1 -s success -l INFO` 
+
+## Spring Boot Actuator Kafka health
+To be able to monitor the Kafka connection required for sending events, add the following to your application.yml:
+```yaml
+management:
+  server:
+    port: 8080
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      group:
+        kafka:
+          include: "kafka"
+          show-details: "always"
+```
