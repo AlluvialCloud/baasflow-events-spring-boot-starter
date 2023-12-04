@@ -45,7 +45,12 @@ public class KafkaHealthIndicator implements HealthIndicator {
 
     public void setUnhealthy(Exception exception) {
         if (!isDown()) {
-            String detail = exception == null ? "unknown" : ExceptionUtils.getStackTrace(exception);
+            this.setUnhealthy(exception == null ? "unknown" : ExceptionUtils.getStackTrace(exception));
+        }
+    }
+
+    public void setUnhealthy(String detail) {
+        if (!isDown()) {
             this.healthStatus.set(Health.down().withDetail("exception", detail).build());
         }
 
