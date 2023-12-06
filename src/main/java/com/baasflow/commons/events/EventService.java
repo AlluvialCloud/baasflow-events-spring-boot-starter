@@ -168,7 +168,7 @@ public class EventService {
                 .build();
     }
 
-    private static String printStacktrace(Throwable throwable) {
+    public static String printStacktrace(Throwable throwable) {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         throwable.printStackTrace(pw);
