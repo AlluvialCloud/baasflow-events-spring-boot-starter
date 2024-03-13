@@ -53,6 +53,8 @@ public class Runner implements CommandLineRunner {
         private String eventStatus;
         @CommandLine.Option(names = {"-p", "--payload"}, description = "Payload")
         private String payload;
+        @CommandLine.Option(names = {"-pf", "--payloadFormat"}, description = "Payload format")
+        private String payloadFormat;
         @CommandLine.Option(names = {"-pt", "--payloadType"}, description = "Payload type")
         private String payloadType;
 
@@ -69,6 +71,7 @@ public class Runner implements CommandLineRunner {
                     .setEventType(eventTypeResolved)
                     .setEventStatus(eventStatusResolved)
                     .setPayload(payload)
+                    .setPayloadFormat(payloadFormat)
                     .setPayloadType(payloadType)
                     .setEventLogLevel(eventLogLevelResolved)
             );

@@ -115,6 +115,23 @@ public class EventService {
     }
 
     /**
+     * Sends an event message using the provided parameters.
+     *
+     * @param sourceModule   the source module of the event
+     * @param event          the name of the event
+     * @param eventType      the type of the event
+     * @param eventStatus    the status of the event
+     * @param payload        the payload of the event
+     * @param payloadType    the type of the payload
+     * @param payloadFormat  the format of the payload
+     * @param correlationIds the correlation IDs to associate with the event
+     */
+    public void sendEvent(String sourceModule, String event, EventType eventType, EventStatus eventStatus, String payload, String payloadFormat, String payloadType, Map<String, String> correlationIds) {
+        Event eventMessage = builder.event(sourceModule, event, eventType, eventStatus, payload, payloadFormat, payloadType, correlationIds);
+        send(eventMessage);
+    }
+
+    /**
      * Executes a function with an audited event message using the provided event builder.
      *
      * @param eventBuilder the function that applies modifications to the event builder
@@ -163,6 +180,7 @@ public class EventService {
                 .setEvent(builder.getEvent())
                 .setTenantId(builder.getTenantId())
                 .setPayload(printStacktrace(e))
+                .setPayloadFormat("text/plain")
                 .setPayloadType("string")
                 .setCorrelationIds(correlationIds)
                 .build();

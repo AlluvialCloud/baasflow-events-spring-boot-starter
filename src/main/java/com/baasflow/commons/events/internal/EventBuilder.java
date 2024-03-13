@@ -61,6 +61,20 @@ public class EventBuilder {
                 .build();
     }
 
+    public Event event(String sourceModule, String event, EventType eventType, EventStatus eventStatus, String payload, String payloadFormat, String payloadType, Map<String, String> correlationIds) {
+        return createEventBuilder()
+                .setEvent(event)
+                .setEventLogLevel(EventLogLevel.INFO)
+                .setEventType(eventType)
+                .setEventStatus(eventStatus)
+                .setSourceModule(sourceModule)
+                .setPayload(payload)
+                .setPayloadFormat(payloadFormat)
+                .setPayloadType(payloadType)
+                .setCorrelationIds(correlationIds)
+                .build();
+    }
+
     public static Event.Builder createEventBuilder() {
         return Event.newBuilder()
                 .setId(UUID.randomUUID())

@@ -27,6 +27,7 @@ class TestEventService {
 
         eventService.sendEvent(event ->
                 event.setPayload("payload")
+                        .setPayloadFormat("text/plain")
                         .setPayloadType("string")
                         .setSourceModule("source module"));
 
@@ -34,6 +35,7 @@ class TestEventService {
 
         Event captured = valueCapture.getValue();
         assertEquals("payload", captured.getPayload());
+        assertEquals("text/plain", captured.getPayloadFormat());
         assertEquals("string", captured.getPayloadType());
         assertEquals("source module", captured.getSourceModule());
     }

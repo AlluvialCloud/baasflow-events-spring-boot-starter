@@ -119,8 +119,17 @@
       "default": null
     },
     {
+      "name": "payloadFormat",
+      "doc": "Format of the payload, use MIME type here.",
+      "type": [
+        "null",
+        "string"
+      ],
+      "default": null
+    },
+    {
       "name": "payloadType",
-      "doc": "Type of the payload",
+      "doc": "Type of the payload, points to the schema of the payload (e.g. XSD URI for XML, AVSC FQDN for Avro).",
       "type": [
         "null",
         "string"

@@ -64,6 +64,7 @@ public class AuditEventPublisher {
         private int statusCode; // ??? --> eventStatus
         private EventStatus eventStatus; // eventStatus
         private Map<String, String> params = new HashMap<>(); // correlationIds
+        // payloadFormat
         // payloadType
         // payload
         // tenantId ? from http-header???
